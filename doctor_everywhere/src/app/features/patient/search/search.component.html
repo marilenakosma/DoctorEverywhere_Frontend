@@ -26,31 +26,33 @@
         </button>
       </div>
 
-      <div *ngIf="locationMode === 'gps' && gpsLoading"
-           class="d-flex align-items-center gap-2 text-muted small">
-        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-        Getting your location…
-      </div>
+      @if (locationMode === 'gps' && gpsLoading) {
+        <div class="d-flex align-items-center gap-2 text-muted small">
+          <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+          Getting your location…
+        </div>
+      }
 
-      <div *ngIf="locationMode === 'gps' && !gpsLoading && locationReady && !gpsError"
-           class="small text-success">
-        ✅ Location found
-      </div>
+      @if (locationMode === 'gps' && !gpsLoading && locationReady && !gpsError) {
+        <div class="small text-success">✅ Location found</div>
+      }
 
-      <div class="d-flex gap-2" *ngIf="locationMode === 'manual'">
-        <input
-          class="form-control"
-          type="text"
-          [(ngModel)]="manualAddress"
-          placeholder="e.g. Kifisias 12, Athens"
-          (keyup.enter)="searchByAddress()"
-        />
-        <button class="btn btn-primary px-4" (click)="searchByAddress()">Search</button>
-      </div>
+      @if (locationMode === 'manual') {
+        <div class="d-flex gap-2">
+          <input
+            class="form-control"
+            type="text"
+            [(ngModel)]="manualAddress"
+            placeholder="e.g. Kifisias 12, Athens"
+            (keyup.enter)="searchByAddress()"
+          />
+          <button class="btn btn-primary px-4" (click)="searchByAddress()">Search</button>
+        </div>
+      }
 
-      <div *ngIf="gpsError" class="alert alert-warning py-2 mb-0 small">
-        ⚠ {{ gpsError }}
-      </div>
+      @if (gpsError) {
+        <div class="alert alert-warning py-2 mb-0 small">⚠ {{ gpsError }}</div>
+      }
 
     </div>
   </div>
@@ -73,64 +75,71 @@
     <div class="list-panel">
 
       <div class="d-flex gap-2 flex-wrap mb-2">
-        <button
-          *ngFor="let s of specialties"
-          class="btn btn-sm rounded-pill"
-          [class.btn-primary]="specialtyFilter === s || (s === 'All' && specialtyFilter === '')"
-          [class.btn-outline-secondary]="!(specialtyFilter === s || (s === 'All' && specialtyFilter === ''))"
-          (click)="specialtyFilter = s === 'All' ? '' : s; loadDoctors()"
-        >{{ s }}</button>
+        @for (s of specialties; track s) {
+          <button
+            class="btn btn-sm rounded-pill"
+            [class.btn-primary]="specialtyFilter === s || (s === 'All' && specialtyFilter === '')"
+            [class.btn-outline-secondary]="!(specialtyFilter === s || (s === 'All' && specialtyFilter === ''))"
+            (click)="specialtyFilter = s === 'All' ? '' : s; loadDoctors()"
+          >{{ s }}</button>
+        }
       </div>
 
-      <div *ngIf="loading" class="text-center text-muted py-3 small">Loading doctors…</div>
-      <div *ngIf="!loading && doctors.length === 0" class="text-center text-muted py-3 small">No doctors found.</div>
-
-      <div
-        class="card border mb-2"
-        *ngFor="let d of doctors"
-        [class.border-primary]="hoveredDoctorId === d.id"
-        (mouseenter)="hoveredDoctorId = d.id"
-        (mouseleave)="hoveredDoctorId = null"
-        style="cursor:pointer;transition:border-color 0.15s"
-      >
-        <div class="card-body d-flex align-items-start gap-3 py-3">
-          <div class="doc-avatar rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0">
-            <span class="small fw-semibold text-primary text-uppercase">{{ d.firstName[0] }}{{ d.lastName[0] }}</span>
-          </div>
-          <div class="flex-grow-1 min-w-0 d-flex flex-column gap-1">
-            <span class="small fw-semibold text-dark">Dr. {{ d.firstName }} {{ d.lastName }}</span>
-            <span class="small text-primary fw-medium">{{ d.specialty }}</span>
-            <span class="d-flex align-items-center gap-1 text-muted" style="font-size:0.75rem">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {{ d.address }} · {{ d.distanceKm }} km
-            </span>
-            <div class="d-flex align-items-center gap-1">
-              <span class="text-warning" *ngFor="let s of stars(d.rating)" style="font-size:0.8125rem">{{ s }}</span>
-              <span class="small fw-semibold text-dark ms-1">{{ d.rating }}</span>
-              <span class="text-muted" style="font-size:0.6875rem">({{ d.reviewCount }})</span>
+      @if (loading) {
+        <div class="text-center text-muted py-3 small">Loading doctors…</div>
+      } @else if (doctors.length === 0) {
+        <div class="text-center text-muted py-3 small">No doctors found.</div>
+      } @else {
+        @for (d of doctors; track d.id) {
+          <div
+            class="card border mb-2"
+            [class.border-primary]="hoveredDoctorId === d.id"
+            (mouseenter)="hoveredDoctorId = d.id"
+            (mouseleave)="hoveredDoctorId = null"
+            style="cursor:pointer;transition:border-color 0.15s"
+          >
+            <div class="card-body d-flex align-items-start gap-3 py-3">
+              <div class="doc-avatar rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0">
+                <span class="small fw-semibold text-primary text-uppercase">{{ d.firstName[0] }}{{ d.lastName[0] }}</span>
+              </div>
+              <div class="flex-grow-1 min-w-0 d-flex flex-column gap-1">
+                <span class="small fw-semibold text-dark">Dr. {{ d.firstName }} {{ d.lastName }}</span>
+                <span class="small text-primary fw-medium">{{ d.specialty }}</span>
+                <span class="d-flex align-items-center gap-1 text-muted" style="font-size:0.75rem">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ d.address }} · {{ d.distanceKm }} km
+                </span>
+                <div class="d-flex align-items-center gap-1">
+                  @for (s of stars(d.rating); track $index) {
+                    <span class="text-warning" style="font-size:0.8125rem">{{ s }}</span>
+                  }
+                  <span class="small fw-semibold text-dark ms-1">{{ d.rating }}</span>
+                  <span class="text-muted" style="font-size:0.6875rem">({{ d.reviewCount }})</span>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-end gap-2 flex-shrink-0">
+                <span class="badge rounded-pill"
+                      [class.bg-success-subtle]="d.availableSlots > 2"
+                      [class.text-success]="d.availableSlots > 2"
+                      [class.bg-warning-subtle]="d.availableSlots <= 2"
+                      [class.text-warning-emphasis]="d.availableSlots <= 2">
+                  {{ d.availableSlots }} slots
+                </span>
+                <button class="btn btn-sm btn-primary" (click)="openBooking(d)" [disabled]="d.availableSlots === 0">
+                  Book
+                </button>
+              </div>
             </div>
           </div>
-          <div class="d-flex flex-column align-items-end gap-2 flex-shrink-0">
-            <span class="badge rounded-pill"
-                  [class.bg-success-subtle]="d.availableSlots > 2"
-                  [class.text-success]="d.availableSlots > 2"
-                  [class.bg-warning-subtle]="d.availableSlots <= 2"
-                  [class.text-warning-emphasis]="d.availableSlots <= 2">
-              {{ d.availableSlots }} slots
-            </span>
-            <button class="btn btn-sm btn-primary" (click)="openBooking(d)" [disabled]="d.availableSlots === 0">
-              Book
-            </button>
-          </div>
-        </div>
-      </div>
+        }
+      }
 
     </div>
   </div>
 </div>
 
-<!-- Booking modal — fixed z-index above Leaflet -->
-<ng-container *ngIf="selectedDoctor">
+<!-- Booking modal -->
+@if (selectedDoctor) {
   <div class="booking-backdrop" (click)="closeBooking()"></div>
   <div class="booking-modal-wrap">
     <div class="booking-modal" (click)="$event.stopPropagation()">
@@ -143,32 +152,34 @@
         <button type="button" class="btn-close" (click)="closeBooking()"></button>
       </div>
 
-      <div *ngIf="bookingSuccess" class="alert alert-success d-flex flex-column gap-2">
-        ✅ Appointment requested! The doctor will confirm shortly.
-        <button class="btn btn-outline-success btn-sm align-self-start" (click)="closeBooking()">Close</button>
-      </div>
-
-      <ng-container *ngIf="!bookingSuccess">
+      @if (bookingSuccess) {
+        <div class="alert alert-success d-flex flex-column gap-2">
+          ✅ Appointment requested! The doctor will confirm shortly.
+          <button class="btn btn-outline-success btn-sm align-self-start" (click)="closeBooking()">Close</button>
+        </div>
+      } @else {
         <p class="small text-muted mb-3">Select a time slot:</p>
 
         <div class="row g-2 mb-3">
-          <div class="col-6" *ngFor="let slot of availableSlots(slots)">
-            <button
-              type="button"
-              class="btn w-100 d-flex flex-column align-items-center py-2"
-              [class.btn-primary]="selectedSlotId === slot.id"
-              [class.btn-outline-secondary]="selectedSlotId !== slot.id"
-              (click)="selectedSlotId = slot.id"
-            >
-              <span style="font-size:0.75rem">{{ formatSlotDate(slot.date) }}</span>
-              <span class="fw-semibold">{{ slot.time }}</span>
-            </button>
-          </div>
+          @for (slot of availableSlots(slots); track slot.id) {
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn w-100 d-flex flex-column align-items-center py-2"
+                [class.btn-primary]="selectedSlotId === slot.id"
+                [class.btn-outline-secondary]="selectedSlotId !== slot.id"
+                (click)="selectedSlotId = slot.id"
+              >
+                <span style="font-size:0.75rem">{{ formatSlotDate(slot.date) }}</span>
+                <span class="fw-semibold">{{ slot.time }}</span>
+              </button>
+            </div>
+          }
         </div>
 
-        <div *ngIf="availableSlots(slots).length === 0" class="text-center text-muted small py-2">
-          No available slots.
-        </div>
+        @if (availableSlots(slots).length === 0) {
+          <div class="text-center text-muted small py-2">No available slots.</div>
+        }
 
         <textarea
           class="form-control mb-3"
@@ -183,8 +194,8 @@
             {{ bookingLoading ? 'Booking…' : 'Confirm Booking' }}
           </button>
         </div>
-      </ng-container>
+      }
 
     </div>
   </div>
-</ng-container>
+}

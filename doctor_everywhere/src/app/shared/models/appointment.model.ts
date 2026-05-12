@@ -11,7 +11,7 @@ export interface Appointment {
   doctorSpecialty: string;
   date: string;
   time: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'rejected' | 'modified';
   notes?: string;
   createdAt: string;
 }

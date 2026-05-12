@@ -1,79 +1,71 @@
+@let user = currentUser$ | async;
+@let role = role$ | async;
+
 <aside class="sidebar d-flex flex-column bg-white border-end h-100">
   <!-- Brand -->
   <div class="sidebar-brand d-flex align-items-center gap-2 px-2 py-2 border-bottom">
     <img src="logo-trans.png" alt="Logo" width="auto" height="120">
-    <!-- <span class="fw-bold text-dark">DoctorEverywhere</span> -->
   </div>
 
   <!-- Navigation -->
   <nav class="nav flex-column gap-1 px-2 py-3 flex-grow-1 overflow-y-auto">
-    <!-- PATIENT LINKS -->
-    @if((role$ | async) === UserRole.Patient) {
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/dashboard"
-      routerLinkActive="active">
-      <i class="bi bi-house-door"></i> Home
-    </a>
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/search"
-      routerLinkActive="active">
-      <i class="bi bi-search"></i> Find Doctors
-    </a>
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/appointments"
-      routerLinkActive="active">
-      <i class="bi bi-calendar-event"></i> My Appointments
-    </a>
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/messages"
-      routerLinkActive="active">
-      <i class="bi bi-chat-dots"></i> Messages
-    </a>
+
+    @if (role === UserRole.Patient) {
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/dashboard" routerLinkActive="active">
+        <i class="bi bi-house-door"></i> Home
+      </a>
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/search" routerLinkActive="active">
+        <i class="bi bi-search"></i> Find Doctors
+      </a>
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/appointments" routerLinkActive="active">
+        <i class="bi bi-calendar-event"></i> My Appointments
+      </a>
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/patient/messages" routerLinkActive="active">
+        <i class="bi bi-chat-dots"></i> Messages
+      </a>
     }
 
-    <!-- DOCTOR LINKS -->
-    @if((role$ | async) === UserRole.Doctor) {
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/doctor/dashboard"
-      routerLinkActive="active">
-      <i class="bi bi-speedometer2"></i> Overview
-    </a>
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/doctor/availability"
-      routerLinkActive="active">
-      <i class="bi bi-clock"></i> My Availability
-    </a>
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/doctor/requests"
-      routerLinkActive="active">
-      <i class="bi bi-card-checklist"></i> Appointment Requests
-    </a>
+    @if (role === UserRole.Doctor) {
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/doctor/dashboard" routerLinkActive="active">
+        <i class="bi bi-speedometer2"></i> Overview
+      </a>
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/doctor/availability" routerLinkActive="active">
+        <i class="bi bi-clock"></i> My Availability
+      </a>
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/doctor/requests" routerLinkActive="active">
+        <i class="bi bi-card-checklist"></i> Appointment Requests
+      </a>
     }
 
-    <!-- MANAGER LINKS -->
-    @if((role$ | async) === UserRole.Manager) {
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/manager/analytics"
-      routerLinkActive="active">
-      <i class="bi bi-graph-up"></i> Analytics
-    </a>
-    <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/manager/reports"
-      routerLinkActive="active">
-      <i class="bi bi-file-earmark-text"></i> System Reports
-    </a>
+    @if (role === UserRole.Manager) {
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/manager/analytics" routerLinkActive="active">
+        <i class="bi bi-graph-up"></i> Analytics
+      </a>
+      <a class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2" routerLink="/manager/reports" routerLinkActive="active">
+        <i class="bi bi-file-earmark-text"></i> System Reports
+      </a>
     }
+
   </nav>
 
   <!-- User Section -->
   <div class="sidebar-user p-3 border-top mt-auto bg-light">
-    @if(currentUser$ | async; as user) {
-    <div class="d-flex align-items-center gap-2 mb-3">
-      <div
-        class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0"
-        style="width: 36px; height: 36px; font-size: 0.9rem;">
-        {{ initials(user.firstName, user.lastName) }}
+    @if (user) {
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div
+          class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0"
+          style="width: 36px; height: 36px; font-size: 0.9rem;">
+          {{ initials(user.firstName, user.lastName) }}
+        </div>
+        <div class="flex-grow-1 overflow-hidden">
+          <div class="small fw-semibold text-dark text-truncate">{{ user.firstName }} {{ user.lastName }}</div>
+          <div class="text-muted text-truncate" style="font-size: 0.75rem;">{{ user.role }}</div>
+        </div>
       </div>
-      <div class="flex-grow-1 overflow-hidden">
-        <div class="small fw-semibold text-dark text-truncate">{{ user.firstName }} {{ user.lastName }}</div>
-        <div class="text-muted text-truncate" style="font-size: 0.75rem;">{{ user.role }}</div>
-      </div>
-    </div>
-    <button class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
-      (click)="logout()">
-      <i class="bi bi-box-arrow-right"></i> Logout
-    </button>
+      <button class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
+        (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
     }
   </div>
 </aside>

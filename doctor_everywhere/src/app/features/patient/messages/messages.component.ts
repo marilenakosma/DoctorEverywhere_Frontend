@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PatientService } from '../services/patient.service';
 import { Message } from '../../../shared/models/message.model';
@@ -8,20 +7,19 @@ import { Appointment } from '../../../shared/models/appointment.model';
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
 export class MessagesComponent implements OnInit {
+  private svc = inject(PatientService);
+
   messages: Message[] = [];
   appointments: Appointment[] = [];
   loading = true;
-
   selectedAppointmentId = '';
   newMessage = '';
   sending = false;
-
-  constructor(private svc: PatientService) {}
 
   ngOnInit(): void {
     this.svc.getMyMessages().subscribe(m => { this.messages = m; this.loading = false; });

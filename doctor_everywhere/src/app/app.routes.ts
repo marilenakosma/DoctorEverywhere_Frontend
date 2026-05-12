@@ -42,7 +42,7 @@ export const APP_ROUTES: Routes = [
       },
       {
         path: '',
-        redirectTo: 'patient/dashboard',
+        redirectTo: '/auth/login',
         pathMatch: 'full',
       },
     ],

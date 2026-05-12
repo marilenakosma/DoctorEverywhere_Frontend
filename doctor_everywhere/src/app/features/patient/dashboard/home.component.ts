@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../shared/services/auth.service';
@@ -11,45 +11,43 @@ import { UserInfo } from '../../../shared/models/user-identity.model';
 @Component({
   selector: 'app-patient-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [AsyncPipe, NgClass, RouterLink],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class PatientHomeComponent implements OnInit {
-  user$!: Observable<UserInfo | null>;
+  private auth = inject(AuthService);
+  private svc = inject(PatientService);
+
+  readonly user$: Observable<UserInfo | null> = this.auth.currentUser$;
+
   upcomingAppointments: Appointment[] = [];
   pendingAppointments: Appointment[] = [];
-  rejectedAppointments: Appointment[] = [];
   unreadMessages: Message[] = [];
   loading = true;
-
-  constructor(private auth: AuthService, private patientSvc: PatientService) {
-    this.user$ = this.auth.currentUser$;
-  }
 
   ngOnInit(): void {
     const today = new Date().toISOString().split('T')[0];
 
-    this.patientSvc.getMyAppointments().subscribe(appts => {
+    this.svc.getMyAppointments().subscribe(appts => {
       this.upcomingAppointments = appts
         .filter(a => a.date >= today && a.status !== 'cancelled')
         .slice(0, 3);
+      this.pendingAppointments = appts.filter(a => a.status === 'pending');
       this.loading = false;
     });
 
-    this.patientSvc.getMyMessages().subscribe(msgs => {
+    this.svc.getMyMessages().subscribe(msgs => {
       this.unreadMessages = msgs.filter(m => !m.read && !m.fromPatient).slice(0, 3);
     });
   }
 
-
-
   statusClass(status: string): string {
     return ({
       confirmed: 'status-confirmed',
-      pending: 'status-pending',
-      rejected: 'status-rejected',
-      modified: 'status-modified',
+      pending:   'status-pending',
+      rejected:  'status-rejected',
+      modified:  'status-modified',
       cancelled: 'status-cancelled',
     } as Record<string, string>)[status] ?? '';
   }

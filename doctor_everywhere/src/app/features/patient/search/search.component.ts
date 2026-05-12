@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { PatientService } from '../services/patient.service';
@@ -9,11 +8,11 @@ import { AppointmentRequest } from '../../../shared/models/appointment.model';
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SearchComponent implements AfterViewInit, OnDestroy {
 
   private map!: L.Map;
   private userMarker!: L.CircleMarker;
@@ -39,9 +38,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   bookingSuccess = false;
   bookingLoading = false;
 
-  constructor(private svc: PatientService) { }
-
-  ngOnInit(): void { }
+  private svc = inject(PatientService);
 
   ngAfterViewInit(): void {
     // Wait for DOM to fully render before initializing map
