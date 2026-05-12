@@ -1,0 +1,45 @@
+@use '../auth.styles';
+
+// Role selector — register-specific
+.role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.role-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+  }
+
+  &.active {
+    border-color: #185FA5;
+    background: #eff6ff;
+
+    .role-btn-label { color: #185FA5; }
+  }
+}
+
+.role-btn-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.role-btn-desc {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+}

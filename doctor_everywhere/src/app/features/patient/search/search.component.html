@@ -1,0 +1,201 @@
+<div class="d-flex flex-column gap-4">
+
+  <div>
+    <h1 class="h4 fw-semibold text-dark mb-1">Find Doctors</h1>
+    <p class="text-muted small mb-0">Browse nearby doctors and book an appointment.</p>
+  </div>
+
+  <!-- Location panel -->
+  <div class="card border">
+    <div class="card-body d-flex flex-column gap-3">
+
+      <div class="d-flex gap-2">
+        <button class="btn d-flex align-items-center gap-2"
+                [class.btn-primary]="locationMode === 'gps'"
+                [class.btn-outline-secondary]="locationMode !== 'gps'"
+                (click)="locationMode = 'gps'; useGPS()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+          Use my location
+        </button>
+        <button class="btn d-flex align-items-center gap-2"
+                [class.btn-primary]="locationMode === 'manual'"
+                [class.btn-outline-secondary]="locationMode !== 'manual'"
+                (click)="locationMode = 'manual'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Enter address
+        </button>
+      </div>
+
+      @if (locationMode === 'gps' && gpsLoading) {
+        <div class="d-flex align-items-center gap-2 text-muted small">
+          <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+          Getting your location…
+        </div>
+      }
+
+      @if (locationMode === 'gps' && !gpsLoading && locationReady && !gpsError) {
+        <div class="small text-success">✅ Location found</div>
+      }
+
+      @if (locationMode === 'manual') {
+        <div class="d-flex gap-2">
+          <input
+            class="form-control"
+            type="text"
+            [(ngModel)]="manualAddress"
+            placeholder="e.g. Kifisias 12, Athens"
+            (keyup.enter)="searchByAddress()"
+          />
+          <button class="btn btn-primary px-4" (click)="searchByAddress()">Search</button>
+        </div>
+      }
+
+      @if (gpsError) {
+        <div class="alert alert-warning py-2 mb-0 small">⚠ {{ gpsError }}</div>
+      }
+
+    </div>
+  </div>
+
+  <!-- Map + list -->
+  <div class="map-list-layout">
+
+    <div class="map-wrap">
+      <div id="search-map"></div>
+      <div class="map-legend">
+        <span class="d-flex align-items-center gap-2">
+          <span class="legend-dot" style="background:#185FA5"></span> You
+        </span>
+        <span class="d-flex align-items-center gap-2">
+          <span class="legend-dot" style="background:#ef4444"></span> Doctor (click to book)
+        </span>
+      </div>
+    </div>
+
+    <div class="list-panel">
+
+      <div class="d-flex gap-2 flex-wrap mb-2">
+        @for (s of specialties; track s) {
+          <button
+            class="btn btn-sm rounded-pill"
+            [class.btn-primary]="specialtyFilter === s || (s === 'All' && specialtyFilter === '')"
+            [class.btn-outline-secondary]="!(specialtyFilter === s || (s === 'All' && specialtyFilter === ''))"
+            (click)="specialtyFilter = s === 'All' ? '' : s; loadDoctors()"
+          >{{ s }}</button>
+        }
+      </div>
+
+      @if (loading) {
+        <div class="text-center text-muted py-3 small">Loading doctors…</div>
+      } @else if (doctors.length === 0) {
+        <div class="text-center text-muted py-3 small">No doctors found.</div>
+      } @else {
+        @for (d of doctors; track d.id) {
+          <div
+            class="card border mb-2"
+            [class.border-primary]="hoveredDoctorId === d.id"
+            (mouseenter)="hoveredDoctorId = d.id"
+            (mouseleave)="hoveredDoctorId = null"
+            style="cursor:pointer;transition:border-color 0.15s"
+          >
+            <div class="card-body d-flex align-items-start gap-3 py-3">
+              <div class="doc-avatar rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0">
+                <span class="small fw-semibold text-primary text-uppercase">{{ d.firstName[0] }}{{ d.lastName[0] }}</span>
+              </div>
+              <div class="flex-grow-1 min-w-0 d-flex flex-column gap-1">
+                <span class="small fw-semibold text-dark">Dr. {{ d.firstName }} {{ d.lastName }}</span>
+                <span class="small text-primary fw-medium">{{ d.specialty }}</span>
+                <span class="d-flex align-items-center gap-1 text-muted" style="font-size:0.75rem">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ d.address }} · {{ d.distanceKm }} km
+                </span>
+                <div class="d-flex align-items-center gap-1">
+                  @for (s of stars(d.rating); track $index) {
+                    <span class="text-warning" style="font-size:0.8125rem">{{ s }}</span>
+                  }
+                  <span class="small fw-semibold text-dark ms-1">{{ d.rating }}</span>
+                  <span class="text-muted" style="font-size:0.6875rem">({{ d.reviewCount }})</span>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-end gap-2 flex-shrink-0">
+                <span class="badge rounded-pill"
+                      [class.bg-success-subtle]="d.availableSlots > 2"
+                      [class.text-success]="d.availableSlots > 2"
+                      [class.bg-warning-subtle]="d.availableSlots <= 2"
+                      [class.text-warning-emphasis]="d.availableSlots <= 2">
+                  {{ d.availableSlots }} slots
+                </span>
+                <button class="btn btn-sm btn-primary" (click)="openBooking(d)" [disabled]="d.availableSlots === 0">
+                  Book
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+    </div>
+  </div>
+</div>
+
+<!-- Booking modal -->
+@if (selectedDoctor) {
+  <div class="booking-backdrop" (click)="closeBooking()"></div>
+  <div class="booking-modal-wrap">
+    <div class="booking-modal" (click)="$event.stopPropagation()">
+
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <h5 class="fw-semibold mb-0">Dr. {{ selectedDoctor.firstName }} {{ selectedDoctor.lastName }}</h5>
+          <span class="small text-primary fw-medium">{{ selectedDoctor.specialty }}</span>
+        </div>
+        <button type="button" class="btn-close" (click)="closeBooking()"></button>
+      </div>
+
+      @if (bookingSuccess) {
+        <div class="alert alert-success d-flex flex-column gap-2">
+          ✅ Appointment requested! The doctor will confirm shortly.
+          <button class="btn btn-outline-success btn-sm align-self-start" (click)="closeBooking()">Close</button>
+        </div>
+      } @else {
+        <p class="small text-muted mb-3">Select a time slot:</p>
+
+        <div class="row g-2 mb-3">
+          @for (slot of availableSlots(slots); track slot.id) {
+            <div class="col-6">
+              <button
+                type="button"
+                class="btn w-100 d-flex flex-column align-items-center py-2"
+                [class.btn-primary]="selectedSlotId === slot.id"
+                [class.btn-outline-secondary]="selectedSlotId !== slot.id"
+                (click)="selectedSlotId = slot.id"
+              >
+                <span style="font-size:0.75rem">{{ formatSlotDate(slot.date) }}</span>
+                <span class="fw-semibold">{{ slot.time }}</span>
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (availableSlots(slots).length === 0) {
+          <div class="text-center text-muted small py-2">No available slots.</div>
+        }
+
+        <textarea
+          class="form-control mb-3"
+          [(ngModel)]="bookingNotes"
+          placeholder="Notes for the doctor (optional)…"
+          rows="3"
+        ></textarea>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeBooking()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="book()" [disabled]="!selectedSlotId || bookingLoading">
+            {{ bookingLoading ? 'Booking…' : 'Confirm Booking' }}
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+}

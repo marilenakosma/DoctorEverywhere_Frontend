@@ -1,0 +1,14 @@
+<div class="d-flex vh-100 overflow-hidden">
+  <!-- SIDEBAR -->
+  <app-sidebar></app-sidebar>
+
+  <!-- MAIN CONTENT AREA -->
+  <div class="flex-grow-1 d-flex flex-column overflow-hidden">
+    <main class="flex-grow-1 overflow-y-auto bg-light p-4">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- FOOTER (Optional, inside main content) -->
+    <app-footer></app-footer>
+  </div>
+</div>
