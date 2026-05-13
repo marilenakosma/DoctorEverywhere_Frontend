@@ -1,0 +1,93 @@
+<div class="d-flex flex-column gap-4">
+
+  <div>
+    <h1 class="h4 fw-semibold text-dark mb-0">Appointment Requests</h1>
+    <p class="text-muted small mb-0">Review and respond to patient booking requests.</p>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs border-bottom">
+    <li class="nav-item">
+      <button class="nav-link d-flex align-items-center gap-2" [class.active]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+        Pending
+        <span class="badge rounded-pill" [class.bg-warning]="activeTab === 'pending'" [class.bg-secondary]="activeTab !== 'pending'">{{ pending.length }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link d-flex align-items-center gap-2" [class.active]="activeTab === 'accepted'" (click)="activeTab = 'accepted'">
+        Accepted
+        <span class="badge rounded-pill bg-secondary">{{ accepted.length }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link d-flex align-items-center gap-2" [class.active]="activeTab === 'rejected'" (click)="activeTab = 'rejected'">
+        Rejected
+        <span class="badge rounded-pill bg-secondary">{{ rejected.length }}</span>
+      </button>
+    </li>
+  </ul>
+
+  @if (loading) {
+    <div class="text-center text-muted py-4 small">Loading…</div>
+  } @else if (activeList.length === 0) {
+    <div class="text-center text-muted py-4 small">No {{ activeTab }} requests.</div>
+  } @else {
+    <div class="d-flex flex-column gap-3">
+      @for (r of activeList; track r.id) {
+        <div class="card border">
+          <div class="card-body">
+
+            <!-- Patient info row -->
+            <div class="d-flex align-items-start gap-3">
+              <div class="patient-avatar rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0">
+                <span class="fw-semibold text-primary text-uppercase">{{ initials(r.patientName) }}</span>
+              </div>
+
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                  <span class="fw-semibold text-dark">{{ r.patientName }}</span>
+                  @if (r.status === 'accepted') {
+                    <span class="badge rounded-pill bg-success-subtle text-success">Accepted</span>
+                  }
+                  @if (r.status === 'rejected') {
+                    <span class="badge rounded-pill bg-danger-subtle text-danger">Rejected</span>
+                  }
+                  @if (r.status === 'pending') {
+                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">Pending</span>
+                  }
+                </div>
+
+                <div class="d-flex align-items-center gap-1 text-muted small mb-1">
+                  <i class="bi bi-calendar-event"></i>
+                  {{ formatDate(r.date) }} at {{ r.time }}
+                </div>
+
+                <div class="text-muted" style="font-size:0.75rem">Requested {{ timeAgo(r.createdAt) }}</div>
+
+                @if (r.notes) {
+                  <div class="mt-2 p-2 bg-light rounded-2 small text-muted fst-italic">
+                    📝 {{ r.notes }}
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Actions (only for pending) -->
+            @if (r.status === 'pending') {
+              <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-success d-flex align-items-center gap-2" (click)="accept(r.id)">
+                  <i class="bi bi-check-circle"></i> Accept Request
+                </button>
+                <button class="btn btn-outline-danger d-flex align-items-center gap-2" (click)="reject(r.id)">
+                  <i class="bi bi-x-circle"></i> Reject
+                </button>
+              </div>
+            }
+
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

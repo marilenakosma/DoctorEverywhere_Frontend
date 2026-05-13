@@ -1,0 +1,58 @@
+.appt-date-block {
+  width: 44px;
+  height: 48px;
+}
+
+.badge {
+  &.status-confirmed { background-color: #d1fae5 !important; color: #065f46 !important; }
+  &.status-pending   { background-color: #fef3c7 !important; color: #92400e !important; }
+  &.status-rejected  { background-color: #fee2e2 !important; color: #991b1b !important; }
+  &.status-modified  { background-color: #dbeafe !important; color: #1e40af !important; }
+  &.status-cancelled { background-color: #f1f5f9 !important; color: #64748b !important; }
+}
+
+// ── Slots grid ────────────────────────────────────────────────────────────────
+
+.slots-wrapper {
+  overflow-x: auto;
+}
+
+.slots-table {
+  min-width: 520px;
+
+  .time-col {
+    width: 64px;
+    min-width: 64px;
+  }
+
+  .slot-cell {
+    padding: 3px !important;
+  }
+}
+
+.slot-btn {
+  height: 24px;
+  cursor: pointer;
+  transition: background-color 0.1s;
+
+  &.slot-on {
+    background-color: #185FA5;
+
+    &:hover { background-color: #144f8a; }
+  }
+
+  &.slot-off {
+    background-color: #e9ecef;
+
+    &:hover { background-color: #d0d5db; }
+  }
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+
+  &.slot-on  { background-color: #185FA5; }
+  &.slot-off { background-color: #e9ecef; border: 1px solid #dee2e6; }
+}

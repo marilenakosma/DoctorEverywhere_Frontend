@@ -1,0 +1,84 @@
+<div class="d-flex flex-column gap-4">
+
+  <div>
+    <h1 class="h4 fw-semibold text-dark mb-0">Messages</h1>
+    <p class="text-muted small mb-0">Communicate with your patients.</p>
+  </div>
+
+  <!-- Compose -->
+  <div class="card border">
+    <div class="card-body d-flex flex-column gap-3">
+      <h2 class="h6 fw-semibold mb-0">Send a Message</h2>
+      <div class="d-flex gap-2 flex-wrap">
+        <select class="form-select" style="min-width:220px;max-width:320px" [(ngModel)]="selectedAppointmentId">
+          <option value="" disabled>Select patient…</option>
+          @for (a of appointments; track a.id) {
+            <option [value]="a.id">{{ a.patientName }} · {{ a.date }} {{ a.time }}</option>
+          }
+        </select>
+        <input
+          class="form-control flex-grow-1"
+          type="text"
+          [(ngModel)]="newMessage"
+          placeholder="Type your message…"
+          (keyup.enter)="send()"
+        />
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          (click)="send()"
+          [disabled]="!newMessage.trim() || !selectedAppointmentId || sending"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          {{ sending ? 'Sending…' : 'Send' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages list -->
+  @if (loading) {
+    <div class="text-center text-muted py-4 small">Loading messages…</div>
+  } @else if (messages.length === 0) {
+    <div class="text-center text-muted py-4 small">
+      No messages yet. Select a patient and start a conversation.
+    </div>
+  } @else {
+    <div class="d-flex flex-column gap-2">
+      @for (m of messages; track m.id) {
+        <div
+          class="card border"
+          [class.border-start-warning]="m.fromPatient && !m.read"
+          [class.bg-light]="!m.fromPatient"
+        >
+          <div class="card-body d-flex align-items-start gap-3 py-3">
+
+            <div class="msg-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 [class.bg-primary-subtle]="m.fromPatient"
+                 [class.bg-success-subtle]="!m.fromPatient">
+              <span class="small fw-semibold text-uppercase"
+                    [class.text-primary]="m.fromPatient"
+                    [class.text-success]="!m.fromPatient">
+                {{ m.fromPatient ? (m.patientName?.[0] ?? 'P') : 'Me' }}
+              </span>
+            </div>
+
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="small fw-semibold text-dark">
+                  {{ m.fromPatient ? m.patientName : 'You' }}
+                </span>
+                <span class="text-muted" style="font-size:0.75rem">{{ timeAgo(m.sentAt) }}</span>
+                @if (m.fromPatient && !m.read) {
+                  <span class="rounded-circle bg-warning d-inline-block" style="width:8px;height:8px;flex-shrink:0"></span>
+                }
+              </div>
+              <p class="small text-secondary mb-0">{{ m.content }}</p>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

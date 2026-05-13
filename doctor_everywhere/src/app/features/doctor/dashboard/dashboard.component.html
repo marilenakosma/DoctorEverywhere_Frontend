@@ -1,0 +1,162 @@
+@let user = user$ | async;
+
+<div class="d-flex flex-column gap-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between">
+    <div>
+      <h1 class="h4 fw-semibold text-dark mb-1">Welcome, Dr. {{ user?.lastName }}</h1>
+      <p class="text-muted mb-0 small">Here's your schedule for today.</p>
+    </div>
+    <a routerLink="/doctor/requests" class="btn btn-primary d-flex align-items-center gap-2">
+      <i class="bi bi-card-checklist"></i> View Requests
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card border h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div
+            class="stat-icon bg-primary-subtle rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+          >
+            <i class="bi bi-calendar-check text-primary fs-5"></i>
+          </div>
+          <div>
+            <div class="h4 fw-bold mb-0">{{ todayAppointments.length }}</div>
+            <div class="text-muted small">Today's Appointments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div
+            class="stat-icon bg-warning-subtle rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+          >
+            <i class="bi bi-hourglass-split text-warning fs-5"></i>
+          </div>
+          <div>
+            <div class="h4 fw-bold mb-0">{{ pendingRequests.length }}</div>
+            <div class="text-muted small">Pending Requests</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div
+            class="stat-icon bg-danger-subtle rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+          >
+            <i class="bi bi-chat-dots text-danger fs-5"></i>
+          </div>
+          <div>
+            <div class="h4 fw-bold mb-0">{{ unreadMessages.length }}</div>
+            <div class="text-muted small">Unread Messages</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Today's schedule -->
+    <div class="col-lg-6">
+      <div class="card border h-100">
+        <div
+          class="card-header bg-white d-flex align-items-center justify-content-between border-bottom py-3"
+        >
+          <h2 class="h6 fw-semibold mb-0">Today's Schedule</h2>
+          <a
+            routerLink="/doctor/appointments"
+            class="btn btn-link btn-sm text-primary p-0 text-decoration-none"
+            >View all</a
+          >
+        </div>
+
+        @if (loading) {
+          <div class="text-center text-muted py-4 small">Loading…</div>
+        } @else if (todayAppointments.length === 0) {
+          <div class="text-center text-muted py-4 small">No appointments today.</div>
+        } @else {
+          <ul class="list-group list-group-flush">
+            @for (a of todayAppointments; track a.id) {
+              <li class="list-group-item d-flex align-items-center gap-3 py-3">
+                <div
+                  class="patient-avatar rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0"
+                >
+                  <span class="small fw-semibold text-primary text-uppercase">{{
+                    initials(a.patientName ?? '?')
+                  }}</span>
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                  <div class="small fw-semibold text-dark text-truncate">{{ a.patientName }}</div>
+                  <div class="text-muted" style="font-size: 0.8125rem">{{ a.time }}</div>
+                </div>
+                <span class="badge rounded-pill bg-success-subtle text-success">{{ a.time }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+
+    <!-- Pending requests -->
+    <div class="col-lg-6">
+      <div class="card border h-100">
+        <div
+          class="card-header bg-white d-flex align-items-center justify-content-between border-bottom py-3"
+        >
+          <h2 class="h6 fw-semibold mb-0">Pending Requests</h2>
+          <a
+            routerLink="/doctor/requests"
+            class="btn btn-link btn-sm text-primary p-0 text-decoration-none"
+            >View all</a
+          >
+        </div>
+
+        @if (pendingRequests.length === 0) {
+          <div class="text-center text-muted py-4 small">No pending requests.</div>
+        } @else {
+          <ul class="list-group list-group-flush">
+            @for (r of pendingRequests; track r.id) {
+              <li class="list-group-item py-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <div
+                    class="patient-avatar rounded-circle bg-warning-subtle d-flex align-items-center justify-content-center flex-shrink-0"
+                  >
+                    <span class="small fw-semibold text-warning-emphasis text-uppercase">{{
+                      initials(r.patientName)
+                    }}</span>
+                  </div>
+                  <div class="flex-grow-1 min-w-0">
+                    <div class="small fw-semibold text-dark text-truncate">{{ r.patientName }}</div>
+                    <div class="text-muted" style="font-size: 0.8125rem">
+                      {{ formatDate(r.date) }} · {{ r.time }}
+                    </div>
+                  </div>
+                  <span class="text-muted flex-shrink-0" style="font-size: 0.75rem">{{
+                    timeAgo(r.createdAt)
+                  }}</span>
+                </div>
+                @if (r.notes) {
+                  <p class="small text-muted mb-2 fst-italic">📝 {{ r.notes }}</p>
+                }
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-success flex-fill" (click)="accept(r.id)">
+                    <i class="bi bi-check-lg"></i> Accept
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger flex-fill" (click)="reject(r.id)">
+                    <i class="bi bi-x-lg"></i> Reject
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+</div>
