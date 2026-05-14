@@ -4,13 +4,14 @@ import { Observable, of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Appointment } from '../../../shared/models/appointment.model';
 import { Message } from '../../../shared/models/message.model';
-import { DAYS, Day, DoctorRequest, WeeklySchedule } from '../models/doctor.models';
+import { DAYS, Day, DoctorRequest, WeeklySchedule, WeeklyAvailability, SaveSlotsRequest } from '../models/doctor.models';
 
 @Injectable({ providedIn: 'root' })
 export class DoctorService {
   private readonly USE_MOCK = true;
   private readonly base = `${environment.apiUrl}/api`;
   private readonly SCHEDULE_KEY = 'doctor_weekly_schedule';
+  private readonly AVAILABILITY_KEY = 'doctor_weekly_availability';
 
   constructor(private http: HttpClient) {}
 
@@ -91,6 +92,32 @@ export class DoctorService {
   saveWeeklySchedule(schedule: WeeklySchedule): void {
     localStorage.setItem(this.SCHEDULE_KEY, JSON.stringify(schedule));
   }
+
+  getAvailability(): WeeklyAvailability {
+    const stored = localStorage.getItem(this.AVAILABILITY_KEY);
+    if (stored) {
+      try { return JSON.parse(stored); } catch { /* fall through to default */ }
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_AVAILABILITY));
+  }
+
+  saveAvailability(availability: WeeklyAvailability): Observable<void> {
+    const payload: SaveSlotsRequest = {
+      slots: DAYS.flatMap(day =>
+        availability[day].map(r => ({
+          dayOfWeek: day,
+          startTime: r.start,
+          endTime: r.end,
+        }))
+      ),
+    };
+    if (this.USE_MOCK) {
+      console.log('POST /api/availability/slots (mock)', payload);
+      localStorage.setItem(this.AVAILABILITY_KEY, JSON.stringify(availability));
+      return of(void 0);
+    }
+    return this.http.post<void>(`${this.base}/availability/slots`, payload);
+  }
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -103,7 +130,7 @@ const addDays = (n: number): string => {
 
 const today = new Date().toISOString().split('T')[0];
 
-// ── Default weekly schedule ──────────────────────────────────────────────────
+// ── Default weekly schedule (legacy) ─────────────────────────────────────────
 
 const DEFAULT_SCHEDULE: WeeklySchedule = {
   Monday:    ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00', '15:30'],
@@ -111,6 +138,17 @@ const DEFAULT_SCHEDULE: WeeklySchedule = {
   Wednesday: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00'],
   Thursday:  ['09:00', '09:30', '10:00', '10:30', '11:00', '14:00', '14:30'],
   Friday:    ['09:00', '09:30', '10:00', '10:30'],
+  Saturday:  [],
+};
+
+// ── Default weekly availability (ranges) ──────────────────────────────────────
+
+const DEFAULT_AVAILABILITY: WeeklyAvailability = {
+  Monday:    [{ start: '09:00', end: '13:00' }, { start: '16:00', end: '20:00' }],
+  Tuesday:   [{ start: '09:00', end: '13:00' }],
+  Wednesday: [{ start: '09:00', end: '13:00' }, { start: '15:00', end: '18:00' }],
+  Thursday:  [{ start: '09:00', end: '12:00' }],
+  Friday:    [{ start: '09:00', end: '11:00' }],
   Saturday:  [],
 };
 
@@ -122,6 +160,7 @@ const MOCK_REQUESTS: DoctorRequest[] = [
   { id: 'req-3', patientId: 'p3', patientName: 'Anna Kostopoulos',   date: addDays(3), time: '14:00', notes: 'Follow-up after ECG results.', status: 'pending', createdAt: new Date(Date.now() - 86400000).toISOString() },
   { id: 'req-4', patientId: 'p4', patientName: 'Dimitris Alexiou',   date: addDays(1), time: '09:30', notes: 'Chest pain evaluation.', status: 'accepted', createdAt: new Date(Date.now() - 172800000).toISOString() },
   { id: 'req-5', patientId: 'p5', patientName: 'Eleni Stavrou',      date: addDays(4), time: '11:00', status: 'rejected', createdAt: new Date(Date.now() - 259200000).toISOString() },
+  { id: 'req-6', patientId: 'p6', patientName: 'Nikos Konstantinou', date: addDays(5), time: '15:30', notes: 'Requesting earlier appointment if possible.', status: 'pending', createdAt: new Date(Date.now() - 43200000).toISOString() },
 ];
 
 export const MOCK_DOCTOR_APPOINTMENTS: Appointment[] = [

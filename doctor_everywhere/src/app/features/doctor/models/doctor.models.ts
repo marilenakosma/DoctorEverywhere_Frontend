@@ -7,6 +7,23 @@ export const TIME_SLOTS = [
 
 export type WeeklySchedule = Record<Day, string[]>;
 
+export interface AvailabilityRange {
+  start: string;
+  end: string;
+}
+
+export type WeeklyAvailability = Record<Day, AvailabilityRange[]>;
+
+export interface AvailabilitySlot {
+  dayOfWeek: Day;
+  startTime: string;
+  endTime: string;
+}
+
+export interface SaveSlotsRequest {
+  slots: AvailabilitySlot[];
+}
+
 export interface DoctorRequest {
   id: string;
   patientId: string;

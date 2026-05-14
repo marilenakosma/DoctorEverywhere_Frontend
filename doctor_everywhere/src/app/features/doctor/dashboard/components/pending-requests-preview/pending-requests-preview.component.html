@@ -1,7 +1,13 @@
 <div class="card border h-100">
-  <div class="card-header bg-white d-flex align-items-center justify-content-between border-bottom py-3">
+  <div
+    class="card-header bg-white d-flex align-items-center justify-content-between border-bottom py-3"
+  >
     <h2 class="h6 fw-semibold mb-0">Pending Requests</h2>
-    <a routerLink="/doctor/requests" class="btn btn-link btn-sm text-primary p-0 text-decoration-none">View all</a>
+    <a
+      routerLink="/doctor/requests"
+      class="btn btn-link btn-sm text-primary p-0 text-decoration-none"
+      >View all</a
+    >
   </div>
 
   @if (requests.length === 0) {
@@ -11,14 +17,22 @@
       @for (r of requests; track r.id) {
         <li class="list-group-item py-3">
           <div class="d-flex align-items-center gap-2 mb-2">
-            <div class="patient-avatar rounded-circle bg-warning-subtle d-flex align-items-center justify-content-center flex-shrink-0">
-              <span class="small fw-semibold text-warning-emphasis text-uppercase">{{ initials(r.patientName) }}</span>
+            <div
+              class="patient-avatar rounded-circle bg-warning-subtle d-flex align-items-center justify-content-center flex-shrink-0"
+            >
+              <span class="small fw-semibold text-warning-emphasis text-uppercase">{{
+                initials(r.patientName)
+              }}</span>
             </div>
             <div class="flex-grow-1 min-w-0">
               <div class="small fw-semibold text-dark text-truncate">{{ r.patientName }}</div>
-              <div class="text-muted" style="font-size:0.8125rem">{{ formatDate(r.date) }} · {{ r.time }}</div>
+              <div class="text-muted" style="font-size: 0.8125rem">
+                {{ formatDate(r.date) }} · {{ r.time }}
+              </div>
             </div>
-            <span class="text-muted flex-shrink-0" style="font-size:0.75rem">{{ timeAgo(r.createdAt) }}</span>
+            <span class="text-muted flex-shrink-0" style="font-size: 0.75rem">{{
+              timeAgo(r.createdAt)
+            }}</span>
           </div>
           @if (r.notes) {
             <p class="small text-muted mb-2 fst-italic">📝 {{ r.notes }}</p>
