@@ -1,6 +1,6 @@
 export interface UserInfo {
   id: string;
-  email: string;
+  username: string;
   firstName: string;
   lastName: string;
   role: UserRole;
@@ -8,16 +8,14 @@ export interface UserInfo {
 
 export interface JwtPayload {
   sub: string;
-  email: string;
-  role: UserRole;
-  firstName: string;
-  lastName: string;
+  unique_name: string;
+  role: string;
   exp: number;
   iat: number;
 }
 
 export enum UserRole {
   Patient = 'Patient',
-  Doctor = 'Doctor',
+  Doctor  = 'Doctor',
   Manager = 'Manager'
 }

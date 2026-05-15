@@ -3,13 +3,12 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { UserInfo, UserRole } from '../../shared/models/user-identity.model';
 
-// ── Helper: get user from service OR directly from localStorage ───────────────
+// ── Helper: get user from service OR localStorage ─────────────────────────────
 function resolveUser(auth: AuthService): UserInfo | null {
   const fromService = auth.getCurrentUser();
   if (fromService) return fromService;
 
-  // Fallback: read directly from localStorage (handles post-redirect timing)
-  const stored = localStorage.getItem('mock_user');
+  const stored = localStorage.getItem('current_user');
   if (stored) {
     try { return JSON.parse(stored); } catch { return null; }
   }
@@ -18,7 +17,7 @@ function resolveUser(auth: AuthService): UserInfo | null {
 
 // ── Auth guard — any authenticated user ───────────────────────────────────────
 export const authGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+  const auth   = inject(AuthService);
   const router = inject(Router);
 
   if (auth.isAuthenticated()) return true;
@@ -30,7 +29,7 @@ export const authGuard: CanActivateFn = () => {
 // ── Role guard — specific role required ───────────────────────────────────────
 export const roleGuard = (allowedRole: UserRole): CanActivateFn => {
   return () => {
-    const auth = inject(AuthService);
+    const auth   = inject(AuthService);
     const router = inject(Router);
 
     if (!auth.isAuthenticated()) {
@@ -47,20 +46,20 @@ export const roleGuard = (allowedRole: UserRole): CanActivateFn => {
 
     if (user.role === allowedRole) return true;
 
-    // Authenticated but wrong role — redirect to their own dashboard
+    // Wrong role — redirect to their own dashboard
     const routes: Record<UserRole, string> = {
       [UserRole.Patient]: '/patient/dashboard',
-      [UserRole.Doctor]: '/doctor/dashboard',
+      [UserRole.Doctor]:  '/doctor/dashboard',
       [UserRole.Manager]: '/manager/dashboard',
     };
-    router.navigate([routes[user.role] ?? '/auth/login']);
+    router.navigate([routes[user.role]]);
     return false;
   };
 };
 
 // ── Public guard — redirects logged-in users away from auth pages ─────────────
 export const publicGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+  const auth   = inject(AuthService);
   const router = inject(Router);
 
   if (!auth.isAuthenticated()) return true;

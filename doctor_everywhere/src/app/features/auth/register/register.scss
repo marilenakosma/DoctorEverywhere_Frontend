@@ -1,6 +1,17 @@
 @use '../auth.styles';
 
-// Role selector — register-specific
+// ── Fix vertical centering cutting off top of card ────────────────────────────
+:host {
+  display: block;
+}
+
+.auth-wrapper {
+  align-items: flex-start !important;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+// ── Role selector ─────────────────────────────────────────────────────────────
 .role-selector {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -42,4 +53,30 @@
 .role-btn-desc {
   font-size: 0.8125rem;
   color: #94a3b8;
+}
+
+// ── Doctor fields section ─────────────────────────────────────────────────────
+.extra-fields {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  background: #f8fafc;
+}
+
+.section-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.geocoding-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin-top: 4px;
 }

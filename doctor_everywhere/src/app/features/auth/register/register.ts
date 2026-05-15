@@ -1,12 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
-import { RegisterRequest } from '../../../shared/models/auth.model';
 import { UserRole } from '../../../shared/models/user-identity.model';
 
 function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
-  const pw = group.get('password')?.value;
+  const pw      = group.get('password')?.value;
   const confirm = group.get('confirmPassword')?.value;
   return pw && confirm && pw !== confirm ? { passwordMismatch: true } : null;
 }
@@ -14,73 +14,161 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrls: ['./register.scss']
 })
 export class RegisterComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private auth = inject(AuthService);
-
-  form = this.fb.group({
-    firstName: ['', [Validators.required, Validators.minLength(2)]],
-    lastName:  ['', [Validators.required, Validators.minLength(2)]],
-    email:     ['', [Validators.required, Validators.email]],
-    role:      [UserRole.Patient, Validators.required],
-    specialty:     [''],
-    licenseNumber: [''],
-    address:       [''],
-    password:        ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
-    confirmPassword: ['', Validators.required],
-  }, { validators: passwordMatchValidator });
-
-  loading = false;
+  form!: FormGroup;
+  loading      = false;
   errorMessage = '';
   showPassword = false;
-  showConfirm = false;
+  showConfirm  = false;
+  geocoding    = false;
 
   readonly roles = [
     { value: UserRole.Patient, label: 'Patient',  description: 'Book & manage appointments' },
     { value: UserRole.Doctor,  label: 'Doctor',   description: 'Manage availability & patients' },
   ];
 
+  // Matches backend Specialty enum exactly
+  readonly specialties = [
+    { value: 0, label: 'General Practitioner' },
+    { value: 1, label: 'Cardiologist' },
+    { value: 2, label: 'Dermatologist' },
+    { value: 3, label: 'Neurologist' },
+    { value: 4, label: 'Pediatrician' },
+    { value: 5, label: 'Psychiatrist' },
+    { value: 6, label: 'Orthopedic' },
+    { value: 7, label: 'Gynecologist' },
+    { value: 8, label: 'Dentist' },
+    { value: 9, label: 'Ophthalmologist' },
+  ];
+
+  constructor(private fb: FormBuilder, private authService: AuthService) {}
+
   ngOnInit(): void {
-    this.role.valueChanges.subscribe((role: UserRole | null) => {
-      if (role === UserRole.Doctor) {
-        this.specialty.setValidators([Validators.required]);
-        this.licenseNumber.setValidators([Validators.required]);
-      } else {
-        this.specialty.clearValidators();
-        this.licenseNumber.clearValidators();
-      }
-      this.specialty.updateValueAndValidity();
-      this.licenseNumber.updateValueAndValidity();
+    this.form = this.fb.group({
+      username:         ['', [Validators.required, Validators.minLength(3)]],
+      firstName:        ['', [Validators.required, Validators.minLength(2)]],
+      lastName:         ['', [Validators.required, Validators.minLength(2)]],
+      role:             [UserRole.Patient, Validators.required],
+      specialty:        [0],
+      officeName:       [''],
+      officeAddress:    [''],
+      officeCity:       [''],
+      officePostalCode: [''],
+      password:         ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword:  ['', Validators.required],
+    }, { validators: passwordMatchValidator });
+
+    this.role.valueChanges.subscribe((role: UserRole) => {
+      const doctorFields = ['officeName', 'officeAddress', 'officeCity', 'officePostalCode'];
+      doctorFields.forEach(f => {
+        const ctrl = this.form.get(f)!;
+        role === UserRole.Doctor
+          ? ctrl.setValidators([Validators.required])
+          : ctrl.clearValidators();
+        ctrl.updateValueAndValidity();
+      });
     });
   }
 
-  get firstName()       { return this.form.get('firstName')!; }
-  get lastName()        { return this.form.get('lastName')!; }
-  get email()           { return this.form.get('email')!; }
-  get role()            { return this.form.get('role')!; }
-  get specialty()       { return this.form.get('specialty')!; }
-  get licenseNumber()   { return this.form.get('licenseNumber')!; }
-  get address()         { return this.form.get('address')!; }
-  get password()        { return this.form.get('password')!; }
-  get confirmPassword() { return this.form.get('confirmPassword')!; }
+  // Geocode address → lat/lng via Nominatim
+  private async geocodeAddress(): Promise<{ lat: number; lng: number } | null> {
+    const address = this.form.get('officeAddress')!.value;
+    const city    = this.form.get('officeCity')!.value;
+    const postal  = this.form.get('officePostalCode')!.value;
+    const query   = `${address}, ${postal} ${city}, Greece`;
+    const url     = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+
+    try {
+      const res     = await fetch(url);
+      const results = await res.json();
+      if (results?.length > 0) {
+        return {
+          lat: parseFloat(results[0].lat),
+          lng: parseFloat(results[0].lon),
+        };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  get username()         { return this.form.get('username')!; }
+  get firstName()        { return this.form.get('firstName')!; }
+  get lastName()         { return this.form.get('lastName')!; }
+  get role()             { return this.form.get('role')!; }
+  get officeName()       { return this.form.get('officeName')!; }
+  get officeAddress()    { return this.form.get('officeAddress')!; }
+  get officeCity()       { return this.form.get('officeCity')!; }
+  get officePostalCode() { return this.form.get('officePostalCode')!; }
+  get password()         { return this.form.get('password')!; }
+  get confirmPassword()  { return this.form.get('confirmPassword')!; }
 
   get isDoctor(): boolean { return this.role.value === UserRole.Doctor; }
   get passwordMismatch(): boolean {
     return this.form.hasError('passwordMismatch') && this.confirmPassword.touched;
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    this.loading = true;
+    this.loading      = true;
     this.errorMessage = '';
-    const { confirmPassword, ...payload } = this.form.value;
-    this.auth.register(payload as RegisterRequest).subscribe({
-      error: (msg: string) => { this.errorMessage = msg; this.loading = false; }
-    });
+
+    const v = this.form.value;
+
+    if (v.role === UserRole.Doctor) {
+      this.geocoding = true;
+      const coords = await this.geocodeAddress();
+      this.geocoding = false;
+
+      if (!coords) {
+        this.errorMessage = 'Could not find coordinates for this address. Please check and try again.';
+        this.loading = false;
+        return;
+      }
+
+      const payload = {
+        username:         v.username,
+        password:         v.password,
+        firstName:        v.firstName,
+        lastName:         v.lastName,
+        specialty:        Number(v.specialty),
+        officeName:       v.officeName,
+        officeAddress:    v.officeAddress,
+        officeCity:       v.officeCity,
+        officePostalCode: v.officePostalCode,
+        latitude:         coords.lat,
+        longitude:        coords.lng,
+        role:             v.role,
+      };
+
+      this.authService.register(payload).subscribe({
+        error: (msg: string) => {
+          this.errorMessage = msg;
+          this.loading      = false;
+        }
+      });
+
+    } else {
+      const payload = {
+        username:  v.username,
+        password:  v.password,
+        firstName: v.firstName,
+        lastName:  v.lastName,
+        role:      v.role,
+      };
+
+      this.authService.register(payload).subscribe({
+        error: (msg: string) => {
+          this.errorMessage = msg;
+          this.loading      = false;
+        }
+      });
+    }
   }
 
   togglePassword(field: 'password' | 'confirm'): void {
