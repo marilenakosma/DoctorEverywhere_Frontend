@@ -30,7 +30,7 @@ export class DoctorAppointmentsComponent implements OnInit {
 
   get upcoming():  Appointment[] {
     return this.appointments.filter(a =>
-      a.startingAt.split('T')[0] >= this.today && a.statusId !== AppointmentStatus.Cancelled
+      a.startingAt.split('T')[0] >= this.today && a.statusId === AppointmentStatus.Confirmed
     );
   }
   get past():      Appointment[] {

@@ -37,7 +37,7 @@ export class DoctorDashboardComponent implements OnInit {
     this.svc.getAppointments().subscribe({
       next: appts => {
         this.todayAppointments = appts.filter(a =>
-          a.startingAt.startsWith(today) && a.statusId === AppointmentStatus.Accepted
+          a.startingAt.startsWith(today) && a.statusId === AppointmentStatus.Confirmed
         );
         this.pendingRequests = appts
           .filter(a => a.statusId === AppointmentStatus.Pending)
