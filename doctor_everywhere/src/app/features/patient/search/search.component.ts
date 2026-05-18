@@ -157,25 +157,31 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  searchByAddress(): void {
-    if (!this.manualAddress.trim()) return;
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.manualAddress)}&limit=1`;
-    fetch(url)
-      .then(r => r.json())
-      .then(results => {
-        if (results && results.length > 0) {
-          const lat = parseFloat(results[0].lat);
-          const lng = parseFloat(results[0].lon);
-          this.center = [lat, lng];
-          this.setUserMarker(lat, lng);
-          this.gpsError = '';
-          this.renderDoctorMarkers();
-        } else {
-          this.gpsError = 'Address not found.';
-        }
-      })
-      .catch(() => { this.gpsError = 'Could not search address.'; });
-  }
+ searchByAddress(): void {
+  if (!this.manualAddress.trim()) return;
+  
+  const query = this.manualAddress.includes('Greece')
+    ? this.manualAddress
+    : `${this.manualAddress}, Greece`;
+
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=gr`;
+  
+  fetch(url)
+    .then(r => r.json())
+    .then(results => {
+      if (results && results.length > 0) {
+        const lat = parseFloat(results[0].lat);
+        const lng = parseFloat(results[0].lon);
+        this.center = [lat, lng];
+        this.setUserMarker(lat, lng);
+        this.gpsError = '';
+        this.renderDoctorMarkers();
+      } else {
+        this.gpsError = 'Address not found. Try: "Street number, City"';
+      }
+    })
+    .catch(() => { this.gpsError = 'Could not search address.'; });
+}
 
   // ── Doctors ───────────────────────────────────────────────────────────────
 
@@ -238,12 +244,17 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.bookingLoading = true;
     const req: AppointmentRequest = {
       doctorId: this.selectedDoctor.id,
-      slotId: this.selectedSlotId,
-      notes: this.bookingNotes,
+      slotId:   this.selectedSlotId,
+      notes:    this.bookingNotes,
     };
-    this.svc.bookAppointment(req).subscribe(() => {
-      this.bookingSuccess = true;
-      this.bookingLoading = false;
+    this.svc.bookAppointment(req).subscribe({
+      next: () => {
+        this.bookingSuccess  = true;
+        this.bookingLoading  = false;
+      },
+      error: () => {
+        this.bookingLoading = false;
+      }
     });
   }
 

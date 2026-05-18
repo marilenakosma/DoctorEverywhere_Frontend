@@ -1,36 +1,46 @@
 <div class="d-flex flex-column gap-4">
 
-  <div>
+  <div class="d-flex align-items-center justify-content-between">
     <h1 class="h4 fw-semibold text-dark mb-0">My Appointments</h1>
+    <button class="btn btn-sm btn-outline-primary" (click)="load()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.18-6.23"/></svg>
+      Refresh
+    </button>
   </div>
 
   <!-- Tabs -->
   <ul class="nav nav-tabs border-bottom">
     <li class="nav-item">
-      <button class="nav-link d-flex align-items-center gap-2" [class.active]="activeTab === 'upcoming'"
-        (click)="activeTab = 'upcoming'">
+      <button class="nav-link d-flex align-items-center gap-2"
+              [class.active]="activeTab === 'upcoming'"
+              (click)="activeTab = 'upcoming'">
         Upcoming
-        <span class="badge rounded-pill bg-secondary">{{ upcoming.length }}</span>
+        <span class="badge rounded-pill bg-primary">{{ upcoming.length }}</span>
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link d-flex align-items-center gap-2" [class.active]="activeTab === 'past'"
-        (click)="activeTab = 'past'">
+      <button class="nav-link d-flex align-items-center gap-2"
+              [class.active]="activeTab === 'past'"
+              (click)="activeTab = 'past'">
         Past
         <span class="badge rounded-pill bg-secondary">{{ past.length }}</span>
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link d-flex align-items-center gap-2" [class.active]="activeTab === 'cancelled'"
-        (click)="activeTab = 'cancelled'">
+      <button class="nav-link d-flex align-items-center gap-2"
+              [class.active]="activeTab === 'cancelled'"
+              (click)="activeTab = 'cancelled'">
         Cancelled
-        <span class="badge rounded-pill bg-secondary">{{ cancelled.length }}</span>
+        <span class="badge rounded-pill bg-danger">{{ cancelled.length }}</span>
       </button>
     </li>
   </ul>
 
   @if (loading) {
-    <div class="text-center text-muted py-4 small">Loading…</div>
+    <div class="text-center text-muted py-4 small">
+      <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+      Loading appointments…
+    </div>
   } @else {
     <div class="d-flex flex-column gap-3">
 
@@ -50,14 +60,17 @@
             <div class="flex-grow-1 min-w-0 d-flex flex-column gap-1">
               <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span class="fw-semibold text-dark">{{ a.doctorName }}</span>
-                <span class="badge rounded-pill" [ngClass]="statusClass(a.status)">{{ a.status }}</span>
+                <span class="badge rounded-pill" [ngClass]="statusClass(a.status)">
+                  {{ a.status | titlecase }}
+                </span>
               </div>
-              <span class="small text-primary fw-medium">{{ a.doctorSpecialty }}</span>
+              @if (a.doctorSpecialty) {
+                <span class="small text-primary fw-medium">{{ a.doctorSpecialty }}</span>
+              }
               <span class="small text-muted d-flex align-items-center gap-1">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
                 </svg>
                 {{ formatDate(a.date) }} at {{ a.time }}
               </span>
@@ -67,9 +80,18 @@
             </div>
 
             <!-- Actions -->
-            @if (activeTab === 'upcoming' && a.status !== 'cancelled') {
+            @if (canCancel(a)) {
               <div class="flex-shrink-0">
-                <button class="btn btn-md btn-outline-danger justify-content-center" (click)="cancel(a.id)">Cancel</button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="cancel(a.id)"
+                  [disabled]="cancellingId === a.id"
+                >
+                  @if (cancellingId === a.id) {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                  }
+                  Cancel
+                </button>
               </div>
             }
 
@@ -78,7 +100,12 @@
       }
 
       @if (activeList.length === 0) {
-        <div class="text-center text-muted py-4 small">No {{ activeTab }} appointments.</div>
+        <div class="text-center text-muted py-4 small">
+          No {{ activeTab }} appointments.
+          @if (activeTab === 'upcoming') {
+            <a routerLink="/patient/search" class="text-primary ms-1">Find a doctor →</a>
+          }
+        </div>
       }
 
     </div>
