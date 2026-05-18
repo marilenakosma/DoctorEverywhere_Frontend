@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, catchError } from 'rxjs';
 import { Doctor, TimeSlot } from '../../../shared/models/doctor.model';
+import { Appointment, AppointmentRequest, AppointmentStatus, AppointmentStatusLabel } from '../../../shared/models/appointment.model';
 import { Appointment, AppointmentStatus } from '../../../shared/models/appointment.model';
 import { Message } from '../../../shared/models/message.model';
 import { environment } from '../../../../environments/environment';
@@ -54,7 +55,6 @@ export class PatientService {
     if (specialty !== '' && specialty !== null && specialty !== undefined) {
       params.specialty = Number(specialty);
     }
-
     return this.http.get<any[]>(`${this.base}/doctor/search`, { params }).pipe(
       map(doctors => doctors.map(d => this.mapDoctor(d))),
       catchError(() => of([]))
@@ -89,12 +89,42 @@ export class PatientService {
     );
   }
 
-  // ── Appointments — MOCK ⏳ ────────────────────────────────────────────────
+  // ── Appointments — REAL API ✅ ────────────────────────────────────────────
 
   getMyAppointments(): Observable<Appointment[]> {
-    return of(MOCK_APPOINTMENTS);
+    return this.http.get<any[]>(`${this.base}/appointment/my`).pipe(
+      map(appointments => appointments.map(a => this.mapAppointment(a))),
+      catchError(() => of([]))
+    );
   }
 
+  // POST /api/appointment/request?doctorId={id}
+  // Body: { startingAt: "2026-05-20T09:00:00" }
+  bookAppointment(req: AppointmentRequest): Observable<any> {
+    // Parse doctorId and startingAt from slotId format: "{doctorId}-{date}-{time}"
+    const parts     = req.slotId.split('-');
+    const doctorId  = parts[0];
+    const date      = parts.slice(1, 4).join('-');  // YYYY-MM-DD
+    const time      = parts.slice(4).join(':');      // HH:MM
+    const startingAt = `${date}T${time}:00`;
+
+    return this.http.post<any>(
+      `${this.base}/appointment/request?doctorId=${doctorId}`,
+      { startingAt }
+    ).pipe(
+      catchError(err => { throw err; })
+    );
+  }
+
+  // PATCH /api/appointment/{id}/status
+  // Body: { statusId: 2 } ← 2 = Cancelled
+  cancelAppointment(id: string): Observable<void> {
+    return this.http.patch<void>(
+      `${this.base}/appointment/${id}/status`,
+      { statusId: AppointmentStatus.Cancelled }
+    ).pipe(
+      catchError(() => of(void 0))
+    );
   bookAppointment(req: AppointmentRequest): Observable<Appointment> {
     const parts = req.slotId.split('-');
     const date = parts.slice(1, 4).join('-');   // "2026-05-20"
@@ -130,7 +160,7 @@ export class PatientService {
     const msg: Message = {
       id:            'msg-' + Date.now(),
       appointmentId,
-      doctorName:    appt?.doctorName ?? 'Doctor',
+      doctorName:    'Doctor',
       content,
       sentAt:        new Date().toISOString(),
       fromPatient:   true,
@@ -140,7 +170,7 @@ export class PatientService {
     return of(msg);
   }
 
-  // ── Mapper ────────────────────────────────────────────────────────────────
+  // ── Mappers ───────────────────────────────────────────────────────────────
 
   private mapDoctor(d: any): Doctor {
     return {
@@ -157,15 +187,28 @@ export class PatientService {
       availableSlots: 1,
     };
   }
+
+  private mapAppointment(a: any): Appointment {
+    const startingAt = new Date(a.startingAt);
+    return {
+      id:              String(a.id),
+      doctorId:        String(a.doctorId),
+      patientId:       String(a.patientId),
+      doctorName:      a.doctorName   ? `Dr. ${a.doctorName}` : 'Doctor',
+      patientName:     a.patientName  ?? '',
+      doctorSpecialty: '',  // not returned by backend yet
+      date:            startingAt.toISOString().split('T')[0],
+      time:            startingAt.toTimeString().slice(0, 5),
+      startingAt:      a.startingAt,
+      status:          AppointmentStatusLabel[a.statusId]?.toLowerCase() ?? 'pending',
+      statusId:        a.statusId,
+      notes:           a.notes ?? '',
+      createdAt:       a.requestedAt ?? new Date().toISOString(),
+    };
+  }
 }
 
-// ── Mock data ─────────────────────────────────────────────────────────────────
-
-const addDays = (n: number) => {
-  const d = new Date(); d.setDate(d.getDate() + n);
-  return d.toISOString().split('T')[0];
-};
-
+// ── Mock data — messages only ──────────────────────────────────────────────────
 export const MOCK_APPOINTMENTS: Appointment[] = [
   { id: 1, patientId: 0, doctorId: 1, doctorName: 'Dr. Elena Papadaki', patientName: 'You', startingAt: `${addDays(2)}T09:30:00`,  statusId: AppointmentStatus.Confirmed, requestedAt: new Date().toISOString() },
   { id: 2, patientId: 0, doctorId: 2, doctorName: 'Dr. Maria Stavrou',  patientName: 'You', startingAt: `${addDays(5)}T10:00:00`,  statusId: AppointmentStatus.Pending,   requestedAt: new Date().toISOString() },
@@ -175,4 +218,5 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
 export const MOCK_MESSAGES: Message[] = [
   { id: 'msg-1', appointmentId: '1', doctorName: 'Dr. Elena Papadaki', content: 'Please bring your previous ECG results.', sentAt: new Date(Date.now() - 3600000).toISOString(),  fromPatient: false, read: false },
   { id: 'msg-2', appointmentId: '2', doctorName: 'Dr. Maria Stavrou',  content: 'Your appointment has been confirmed.',    sentAt: new Date(Date.now() - 86400000).toISOString(), fromPatient: false, read: true  },
+];
 ];
