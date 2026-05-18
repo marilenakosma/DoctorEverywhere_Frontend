@@ -32,7 +32,7 @@ export class PatientHomeComponent implements OnInit {
 
     this.svc.getMyAppointments().subscribe(appts => {
       this.upcomingAppointments = appts
-        .filter(a => a.startingAt.split('T')[0] >= today && a.statusId !== AppointmentStatus.Cancelled)
+        .filter(a => a.startingAt.split('T')[0] >= today && a.statusId === AppointmentStatus.Confirmed)
         .slice(0, 3);
       this.pendingAppointments = appts.filter(a => a.statusId === AppointmentStatus.Pending);
       this.loading = false;

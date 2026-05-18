@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { PatientService } from '../services/patient.service';
 import { Doctor, TimeSlot } from '../../../shared/models/doctor.model';
-import { AppointmentRequest } from '../services/patient.service';
+import { AppointmentRequest } from '../../../shared/models/appointment.model';
 
 @Component({
   selector: 'app-search',
@@ -254,14 +254,11 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         this.bookingSuccess  = true;
         this.bookingLoading  = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.bookingLoading = false;
       }
-    this.svc.bookAppointment(req).subscribe(() => {
-      this.bookingSuccess = true;
-      this.bookingLoading = false;
-      this.cdr.detectChanges();
     });
   }
 

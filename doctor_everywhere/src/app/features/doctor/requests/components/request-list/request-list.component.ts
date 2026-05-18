@@ -12,12 +12,13 @@ export class RequestListComponent {
   @Input()  requests: Appointment[] = [];
   @Input()  loading = false;
   @Input()  showActions = false;
-  @Output() accepted = new EventEmitter<number>();
-  @Output() rejected = new EventEmitter<number>();
+  @Output() accepted = new EventEmitter<string>();
+  @Output() rejected = new EventEmitter<string>();
 
   readonly Status = AppointmentStatus;
 
-  initials(name: string): string {
+  initials(name: string | undefined): string {
+    if (!name) return '?';
     return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
   }
 
@@ -28,7 +29,8 @@ export class RequestListComponent {
     return new Date(d).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
   }
 
-  timeAgo(iso: string): string {
+  timeAgo(iso: string | undefined): string {
+    if (!iso) return '';
     const diff = Date.now() - new Date(iso).getTime();
     const m = Math.floor(diff / 60000);
     if (m < 60) return `${m}m ago`;

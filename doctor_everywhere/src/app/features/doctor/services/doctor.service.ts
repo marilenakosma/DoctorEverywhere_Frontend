@@ -53,7 +53,7 @@ export class DoctorService {
     );
   }
 
-  acceptRequest(id: number): Observable<void> {
+  acceptRequest(id: string): Observable<void> {
     if (this.USE_MOCK) return of(void 0);
     return this.http.patch<void>(
       `${this.base}/appointment/${id}/status`,
@@ -61,7 +61,7 @@ export class DoctorService {
     );
   }
 
-  rejectRequest(id: number): Observable<void> {
+  rejectRequest(id: string): Observable<void> {
     if (this.USE_MOCK) return of(void 0);
     return this.http.patch<void>(
       `${this.base}/appointment/${id}/status`,
@@ -207,11 +207,11 @@ const MOCK_DOCTOR_PROFILE: DoctorProfile = {
 };
 
 const MOCK_DOCTOR_APPOINTMENTS: Appointment[] = [
-  { id: 1, patientId: 1, doctorId: 1, startingAt: `${addDays(0)}T09:00:00`, statusId: AppointmentStatus.Confirmed,  requestedAt: new Date(Date.now() - 86400000).toISOString(),  doctorName: 'Dr. You', patientName: 'Dimitris Alexiou'   },
-  { id: 2, patientId: 2, doctorId: 1, startingAt: `${addDays(0)}T11:00:00`, statusId: AppointmentStatus.Confirmed,  requestedAt: new Date(Date.now() - 86400000).toISOString(),  doctorName: 'Dr. You', patientName: 'Sofia Petrou'       },
-  { id: 3, patientId: 3, doctorId: 1, startingAt: `${addDays(1)}T09:30:00`, statusId: AppointmentStatus.Pending,    requestedAt: new Date(Date.now() - 3600000).toISOString(),   doctorName: 'Dr. You', patientName: 'Nikos Konstantinou' },
-  { id: 4, patientId: 4, doctorId: 1, startingAt: `${addDays(-2)}T10:00:00`,statusId: AppointmentStatus.Confirmed,  requestedAt: new Date(Date.now() - 259200000).toISOString(), doctorName: 'Dr. You', patientName: 'Maria Papadaki'     },
-  { id: 5, patientId: 5, doctorId: 1, startingAt: `${addDays(-1)}T14:00:00`,statusId: AppointmentStatus.Cancelled,  requestedAt: new Date(Date.now() - 172800000).toISOString(), doctorName: 'Dr. You', patientName: 'Kostas Dimitriou'   },
+  { id: '1', patientId: '1', doctorId: '1', startingAt: `${addDays(0)}T09:00:00`,  statusId: AppointmentStatus.Confirmed, requestedAt: new Date(Date.now() - 86400000).toISOString(),  doctorName: 'Dr. You', patientName: 'Dimitris Alexiou',   doctorSpecialty: 'Cardiologist', date: addDays(0),  time: '09:00', status: 'confirmed', createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: '2', patientId: '2', doctorId: '1', startingAt: `${addDays(0)}T11:00:00`,  statusId: AppointmentStatus.Confirmed, requestedAt: new Date(Date.now() - 86400000).toISOString(),  doctorName: 'Dr. You', patientName: 'Sofia Petrou',       doctorSpecialty: 'Cardiologist', date: addDays(0),  time: '11:00', status: 'confirmed', createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: '3', patientId: '3', doctorId: '1', startingAt: `${addDays(1)}T09:30:00`,  statusId: AppointmentStatus.Pending,   requestedAt: new Date(Date.now() - 3600000).toISOString(),   doctorName: 'Dr. You', patientName: 'Nikos Konstantinou', doctorSpecialty: 'Cardiologist', date: addDays(1),  time: '09:30', status: 'pending',   createdAt: new Date(Date.now() - 3600000).toISOString() },
+  { id: '4', patientId: '4', doctorId: '1', startingAt: `${addDays(-2)}T10:00:00`, statusId: AppointmentStatus.Confirmed, requestedAt: new Date(Date.now() - 259200000).toISOString(), doctorName: 'Dr. You', patientName: 'Maria Papadaki',     doctorSpecialty: 'Cardiologist', date: addDays(-2), time: '10:00', status: 'confirmed', createdAt: new Date(Date.now() - 259200000).toISOString() },
+  { id: '5', patientId: '5', doctorId: '1', startingAt: `${addDays(-1)}T14:00:00`, statusId: AppointmentStatus.Cancelled, requestedAt: new Date(Date.now() - 172800000).toISOString(), doctorName: 'Dr. You', patientName: 'Kostas Dimitriou',   doctorSpecialty: 'Cardiologist', date: addDays(-1), time: '14:00', status: 'cancelled', createdAt: new Date(Date.now() - 172800000).toISOString() },
 ];
 
 export const MOCK_DOCTOR_MESSAGES: Message[] = [

@@ -54,14 +54,14 @@ export class DoctorDashboardComponent implements OnInit {
     });
   }
 
-  accept(id: number): void {
+  accept(id: string): void {
     this.svc.acceptRequest(id).subscribe(() => {
       this.pendingRequests = this.pendingRequests.filter(r => r.id !== id);
       this.cdr.detectChanges();
     });
   }
 
-  reject(id: number): void {
+  reject(id: string): void {
     this.svc.rejectRequest(id).subscribe(() => {
       this.pendingRequests = this.pendingRequests.filter(r => r.id !== id);
       this.cdr.detectChanges();

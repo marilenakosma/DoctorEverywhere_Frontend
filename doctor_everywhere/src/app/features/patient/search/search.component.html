@@ -1,5 +1,4 @@
 <div class="d-flex flex-column gap-4">
-
   <div>
     <h1 class="h4 fw-semibold text-dark mb-1">Find Doctors</h1>
     <p class="text-muted small mb-0">Browse nearby doctors and book an appointment.</p>
@@ -8,21 +7,52 @@
   <!-- Location + specialty panel -->
   <div class="card border">
     <div class="card-body d-flex flex-column gap-3">
-
       <!-- Location buttons -->
       <div class="d-flex gap-2">
-        <button class="btn d-flex align-items-center gap-2"
-                [class.btn-primary]="locationMode === 'gps'"
-                [class.btn-outline-secondary]="locationMode !== 'gps'"
-                (click)="locationMode = 'gps'; useGPS()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+        <button
+          class="btn d-flex align-items-center gap-2"
+          [class.btn-primary]="locationMode === 'gps'"
+          [class.btn-outline-secondary]="locationMode !== 'gps'"
+          (click)="locationMode = 'gps'; useGPS()"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="3" />
+            <line x1="12" y1="2" x2="12" y2="6" />
+            <line x1="12" y1="18" x2="12" y2="22" />
+            <line x1="2" y1="12" x2="6" y2="12" />
+            <line x1="18" y1="12" x2="22" y2="12" />
+          </svg>
           Use my location
         </button>
-        <button class="btn d-flex align-items-center gap-2"
-                [class.btn-primary]="locationMode === 'manual'"
-                [class.btn-outline-secondary]="locationMode !== 'manual'"
-                (click)="locationMode = 'manual'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <button
+          class="btn d-flex align-items-center gap-2"
+          [class.btn-primary]="locationMode === 'manual'"
+          [class.btn-outline-secondary]="locationMode !== 'manual'"
+          (click)="locationMode = 'manual'"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
           Enter address
         </button>
       </div>
@@ -60,7 +90,7 @@
         <label class="text-muted small mb-0 flex-shrink-0">Specialty:</label>
         <select
           class="form-select form-select-sm"
-          style="max-width:220px"
+          style="max-width: 220px"
           [(ngModel)]="specialtyFilter"
           (change)="loadDoctors()"
         >
@@ -70,31 +100,40 @@
           }
         </select>
         <button class="btn btn-primary btn-sm px-3" (click)="loadDoctors()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
           Search
         </button>
       </div>
-
     </div>
   </div>
 
   <!-- Map + list -->
   <div class="map-list-layout">
-
     <div class="map-wrap">
       <div id="search-map"></div>
       <div class="map-legend">
         <span class="d-flex align-items-center gap-2">
-          <span class="legend-dot" style="background:#185FA5"></span> You
+          <span class="legend-dot" style="background: #185fa5"></span> You
         </span>
         <span class="d-flex align-items-center gap-2">
-          <span class="legend-dot" style="background:#ef4444"></span> Doctor (click to book)
+          <span class="legend-dot" style="background: #ef4444"></span> Doctor (click to book)
         </span>
       </div>
     </div>
 
     <div class="list-panel">
-
       @if (loading) {
         <div class="text-center text-muted py-3 small">Loading doctors…</div>
       } @else if (!searched) {
@@ -110,17 +149,33 @@
             [class.border-primary]="hoveredDoctorId === d.id"
             (mouseenter)="hoveredDoctorId = d.id"
             (mouseleave)="hoveredDoctorId = null"
-            style="cursor:pointer;transition:border-color 0.15s"
+            style="cursor: pointer; transition: border-color 0.15s"
           >
             <div class="card-body d-flex align-items-start gap-3 py-3">
-              <div class="doc-avatar rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0">
-                <span class="small fw-semibold text-primary text-uppercase">{{ d.firstName[0] }}{{ d.lastName[0] }}</span>
+              <div
+                class="doc-avatar rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0"
+              >
+                <span class="small fw-semibold text-primary text-uppercase"
+                  >{{ d.firstName[0] }}{{ d.lastName[0] }}</span
+                >
               </div>
               <div class="flex-grow-1 min-w-0 d-flex flex-column gap-1">
-                <span class="small fw-semibold text-dark">Dr. {{ d.firstName }} {{ d.lastName }}</span>
+                <span class="small fw-semibold text-dark"
+                  >Dr. {{ d.firstName }} {{ d.lastName }}</span
+                >
                 <span class="small text-primary fw-medium">{{ d.specialty }}</span>
-                <span class="d-flex align-items-center gap-1 text-muted" style="font-size:0.75rem">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span class="d-flex align-items-center gap-1 text-muted" style="font-size: 0.75rem">
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
                   {{ d.address }}
                 </span>
               </div>
@@ -131,7 +186,6 @@
           </div>
         }
       }
-
     </div>
   </div>
 </div>
@@ -141,11 +195,12 @@
   <div class="booking-backdrop" (click)="closeBooking()"></div>
   <div class="booking-modal-wrap">
     <div class="booking-modal" (click)="$event.stopPropagation()">
-
       <!-- Modal header -->
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <h5 class="fw-semibold mb-0">Dr. {{ selectedDoctor.firstName }} {{ selectedDoctor.lastName }}</h5>
+          <h5 class="fw-semibold mb-0">
+            Dr. {{ selectedDoctor.firstName }} {{ selectedDoctor.lastName }}
+          </h5>
           <span class="small text-primary fw-medium">{{ selectedDoctor.specialty }}</span>
         </div>
         <button type="button" class="btn-close" (click)="closeBooking()"></button>
@@ -153,18 +208,19 @@
 
       @if (bookingSuccess) {
         <div class="alert alert-success d-flex flex-column gap-2">
-          ✅ Appointment requested! The doctor will confirm shortly.
-          <button class="btn btn-outline-success btn-sm align-self-start" (click)="closeBooking()">Close</button>
+          Appointment requested! The doctor will confirm shortly.
+          <!-- <button class="btn btn-outline-success btn-sm align-self-start" (click)="closeBooking()">
+            Close
+          </button> -->
         </div>
       } @else {
-
         <!-- Date picker -->
         <div class="mb-3">
           <label class="form-label small text-muted">Select date:</label>
           <input
             type="date"
             class="form-control form-control-sm"
-            style="max-width:200px"
+            style="max-width: 200px"
             [(ngModel)]="selectedDate"
             [min]="minDate"
             (change)="loadSlotsForDate()"
@@ -189,7 +245,7 @@
                   [class.btn-outline-secondary]="selectedSlotId !== slot.id"
                   (click)="selectedSlotId = slot.id"
                 >
-                  <span style="font-size:0.75rem">{{ formatSlotDate(slot.date) }}</span>
+                  <span style="font-size: 0.75rem">{{ formatSlotDate(slot.date) }}</span>
                   <span class="fw-semibold">{{ slot.time }}</span>
                 </button>
               </div>
@@ -209,8 +265,15 @@
         ></textarea>
 
         <div class="d-flex justify-content-end gap-2 mb-3">
-          <button type="button" class="btn btn-outline-secondary" (click)="closeBooking()">Cancel</button>
-          <button type="button" class="btn btn-primary" (click)="book()" [disabled]="!selectedSlotId || bookingLoading">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeBooking()">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="book()"
+            [disabled]="!selectedSlotId || bookingLoading"
+          >
             {{ bookingLoading ? 'Booking…' : 'Confirm Booking' }}
           </button>
         </div>
@@ -238,23 +301,25 @@
               @for (r of reviews; track r.createdAt) {
                 <div class="review-item">
                   <div class="d-flex align-items-center justify-content-between mb-1">
-                    <span class="small fw-semibold">{{ r.patientFirstName }} {{ r.patientLastName }}</span>
-                    <span class="text-warning" style="font-size:0.8rem">
+                    <span class="small fw-semibold"
+                      >{{ r.patientFirstName }} {{ r.patientLastName }}</span
+                    >
+                    <span class="text-warning" style="font-size: 0.8rem">
                       @for (s of starsFromRating(r.rating); track $index) {
                         {{ s }}
                       }
                     </span>
                   </div>
                   <p class="small text-muted mb-1">{{ r.comments }}</p>
-                  <span class="text-muted" style="font-size:0.7rem">{{ r.createdAt | date:'dd MMM yyyy' }}</span>
+                  <span class="text-muted" style="font-size: 0.7rem">{{
+                    r.createdAt | date: 'dd MMM yyyy'
+                  }}</span>
                 </div>
               }
             </div>
           }
         </div>
-
       }
-
     </div>
   </div>
 }
