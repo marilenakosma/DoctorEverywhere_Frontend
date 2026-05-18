@@ -3,16 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, catchError } from 'rxjs';
 import { Doctor, TimeSlot } from '../../../shared/models/doctor.model';
 import { Appointment, AppointmentRequest, AppointmentStatus, AppointmentStatusLabel } from '../../../shared/models/appointment.model';
-import { Appointment, AppointmentStatus } from '../../../shared/models/appointment.model';
 import { Message } from '../../../shared/models/message.model';
 import { environment } from '../../../../environments/environment';
-
-// Patient-specific booking request (used only by search + bookAppointment mock)
-export interface AppointmentRequest {
-  doctorId: string;
-  slotId: string;
-  notes?: string;
-}
 
 // Matches backend Specialty enum exactly
 const SpecialtyMap: Record<string, number> = {
@@ -125,28 +117,6 @@ export class PatientService {
     ).pipe(
       catchError(() => of(void 0))
     );
-  bookAppointment(req: AppointmentRequest): Observable<Appointment> {
-    const parts = req.slotId.split('-');
-    const date = parts.slice(1, 4).join('-');   // "2026-05-20"
-    const time = parts.slice(4).join(':');       // "09:30"
-    const appt: Appointment = {
-      id:          Date.now(),
-      patientId:   0,
-      doctorId:    Number(req.doctorId) || 0,
-      doctorName:  'Doctor',
-      patientName: 'You',
-      startingAt:  `${date}T${time}:00`,
-      statusId:    AppointmentStatus.Pending,
-      requestedAt: new Date().toISOString(),
-    };
-    MOCK_APPOINTMENTS.unshift(appt);
-    return of(appt);
-  }
-
-  cancelAppointment(id: number): Observable<void> {
-    const a = MOCK_APPOINTMENTS.find(x => x.id === id);
-    if (a) a.statusId = AppointmentStatus.Cancelled;
-    return of(void 0);
   }
 
   // ── Messages — MOCK ⏳ ────────────────────────────────────────────────────
@@ -156,7 +126,6 @@ export class PatientService {
   }
 
   sendMessage(appointmentId: string, content: string): Observable<Message> {
-    const appt = MOCK_APPOINTMENTS.find(a => String(a.id) === appointmentId);
     const msg: Message = {
       id:            'msg-' + Date.now(),
       appointmentId,
@@ -208,15 +177,7 @@ export class PatientService {
   }
 }
 
-// ── Mock data — messages only ──────────────────────────────────────────────────
-export const MOCK_APPOINTMENTS: Appointment[] = [
-  { id: 1, patientId: 0, doctorId: 1, doctorName: 'Dr. Elena Papadaki', patientName: 'You', startingAt: `${addDays(2)}T09:30:00`,  statusId: AppointmentStatus.Confirmed, requestedAt: new Date().toISOString() },
-  { id: 2, patientId: 0, doctorId: 2, doctorName: 'Dr. Maria Stavrou',  patientName: 'You', startingAt: `${addDays(5)}T10:00:00`,  statusId: AppointmentStatus.Pending,   requestedAt: new Date().toISOString() },
-  { id: 3, patientId: 0, doctorId: 3, doctorName: 'Dr. Nikos Georgiou', patientName: 'You', startingAt: `${addDays(-3)}T11:00:00`, statusId: AppointmentStatus.Confirmed, requestedAt: new Date().toISOString() },
-];
-
 export const MOCK_MESSAGES: Message[] = [
   { id: 'msg-1', appointmentId: '1', doctorName: 'Dr. Elena Papadaki', content: 'Please bring your previous ECG results.', sentAt: new Date(Date.now() - 3600000).toISOString(),  fromPatient: false, read: false },
   { id: 'msg-2', appointmentId: '2', doctorName: 'Dr. Maria Stavrou',  content: 'Your appointment has been confirmed.',    sentAt: new Date(Date.now() - 86400000).toISOString(), fromPatient: false, read: true  },
-];
 ];

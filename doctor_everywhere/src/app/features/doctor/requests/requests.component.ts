@@ -35,7 +35,7 @@ export class DoctorRequestsComponent implements OnInit {
          : this.rejected;
   }
 
-  accept(id: number): void {
+  accept(id: string): void {
     this.svc.acceptRequest(id).subscribe(() => {
       const r = this.requests.find(x => x.id === id);
       if (r) r.statusId = AppointmentStatus.Confirmed;
@@ -43,7 +43,7 @@ export class DoctorRequestsComponent implements OnInit {
     });
   }
 
-  reject(id: number): void {
+  reject(id: string): void {
     this.svc.rejectRequest(id).subscribe(() => {
       const r = this.requests.find(x => x.id === id);
       if (r) r.statusId = AppointmentStatus.Rejected;

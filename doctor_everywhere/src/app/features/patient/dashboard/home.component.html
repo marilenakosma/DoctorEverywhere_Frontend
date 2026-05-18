@@ -50,8 +50,8 @@
             </svg>
           </div>
           <div>
-            <div class="h4 fw-bold mb-0">{{ upcomingAppointments.length }}</div>
-            <div class="text-muted small">Upcoming Appointments</div>
+            <div class="h4 fw-bold mb-0">{{ upcomingConfirmedAppointments.length }}</div>
+            <div class="text-muted small">Upcoming Confirmed Appointments</div>
           </div>
         </div>
       </div>
@@ -92,7 +92,7 @@
         <div
           class="card-header bg-white d-flex align-items-center justify-content-between border-bottom py-3"
         >
-          <h2 class="h6 fw-semibold mb-0">Upcoming Appointments</h2>
+          <h2 class="h6 fw-semibold mb-0">Upcoming Confirmed Appointments</h2>
           <a
             routerLink="/patient/appointments"
             class="btn btn-link btn-sm text-primary p-0 text-decoration-none"
@@ -102,14 +102,14 @@
 
         @if (loading) {
           <div class="text-center text-muted py-4 small">Loading…</div>
-        } @else if (upcomingAppointments.length === 0) {
+        } @else if (upcomingConfirmedAppointments.length === 0) {
           <div class="text-center text-muted py-4 small">
             No upcoming appointments.
             <a routerLink="/patient/search" class="text-primary">Book one now →</a>
           </div>
         } @else {
           <ul class="list-group list-group-flush">
-            @for (a of upcomingAppointments; track a.id) {
+            @for (a of upcomingConfirmedAppointments; track a.id) {
               <li class="list-group-item d-flex align-items-center gap-3 py-3">
                 <div
                   class="appt-date-block bg-primary-subtle rounded-2 d-flex flex-column align-items-center justify-content-center flex-shrink-0"
@@ -138,9 +138,54 @@
         }
       </div>
     </div>
+    <!-- Pending appointments -->
+    <div class="col-lg-6">
+      <div class="card border h-100">
+        <div
+          class="card-header bg-white d-flex align-items-center justify-content-between border-bottom py-3"
+        >
+          <h2 class="h6 fw-semibold mb-0">Pending Appointments</h2>
+          <a
+            routerLink="/patient/appointments"
+            class="btn btn-link btn-sm text-primary p-0 text-decoration-none"
+            >View all</a
+          >
+        </div>
+
+        @if (loading) {
+          <div class="text-center text-muted py-4 small">Loading…</div>
+        } @else if (pendingAppointments.length === 0) {
+          <div class="text-center text-muted py-4 small">No pending appointments.</div>
+        } @else {
+          <ul class="list-group list-group-flush">
+            @for (a of pendingAppointments; track a.id) {
+              <li class="list-group-item d-flex align-items-center gap-3 py-3">
+                <div
+                  class="appt-date-block bg-warning-subtle rounded-2 d-flex flex-column align-items-center justify-content-center flex-shrink-0"
+                >
+                  <span class="fw-bold lh-1" style="color: #92400e">{{
+                    formatDate(getDate(a.startingAt)).split(' ')[1]
+                  }}</span>
+                  <span style="font-size: 0.625rem; text-transform: uppercase; color: #92400e">{{
+                    formatDate(getDate(a.startingAt)).split(' ')[2]
+                  }}</span>
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                  <div class="small fw-semibold text-dark text-truncate">{{ a.doctorName }}</div>
+                  <div class="text-muted" style="font-size: 0.8125rem">
+                    {{ getTime(a.startingAt) }}
+                  </div>
+                </div>
+                <span class="badge rounded-pill status-pending">Pending</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
 
     <!-- Unread messages -->
-    <div class="col-lg-6">
+    <!-- <div class="col-lg-6">
       <div class="card border h-100">
         <div
           class="card-header bg-white d-flex align-items-center justify-content-between border-bottom py-3"
@@ -180,6 +225,6 @@
           </ul>
         }
       </div>
-    </div>
+    </div> -->
   </div>
 </div>

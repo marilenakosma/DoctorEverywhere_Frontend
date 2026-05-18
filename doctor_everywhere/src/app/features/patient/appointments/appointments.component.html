@@ -1,37 +1,45 @@
 <div class="d-flex flex-column gap-4">
-
   <div class="d-flex align-items-center justify-content-between">
     <h1 class="h4 fw-semibold text-dark mb-0">My Appointments</h1>
-    <button class="btn btn-sm btn-outline-primary" (click)="load()">
+    <!-- <button class="btn btn-sm btn-outline-primary" (click)="load()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.18-6.23"/></svg>
       Refresh
-    </button>
+    </button> -->
   </div>
 
   <!-- Tabs -->
-  <ul class="nav nav-tabs border-bottom">
+  <ul class="nav appt-tabs">
     <li class="nav-item">
-      <button class="nav-link d-flex align-items-center gap-2"
-              [class.active]="activeTab === 'upcoming'"
-              (click)="activeTab = 'upcoming'">
+      <button
+        class="appt-tab d-flex align-items-center gap-2"
+        [class.active]="activeTab === 'upcoming'"
+        (click)="activeTab = 'upcoming'"
+      >
+        <span class="tab-dot dot-upcoming"></span>
         Upcoming
-        <span class="badge rounded-pill bg-primary">{{ upcoming.length }}</span>
+        <span class="tab-badge badge-upcoming">{{ upcoming.length }}</span>
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link d-flex align-items-center gap-2"
-              [class.active]="activeTab === 'past'"
-              (click)="activeTab = 'past'">
+      <button
+        class="appt-tab d-flex align-items-center gap-2"
+        [class.active]="activeTab === 'past'"
+        (click)="activeTab = 'past'"
+      >
+        <span class="tab-dot dot-past"></span>
         Past
-        <span class="badge rounded-pill bg-secondary">{{ past.length }}</span>
+        <span class="tab-badge badge-past">{{ past.length }}</span>
       </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link d-flex align-items-center gap-2"
-              [class.active]="activeTab === 'cancelled'"
-              (click)="activeTab = 'cancelled'">
+      <button
+        class="appt-tab d-flex align-items-center gap-2"
+        [class.active]="activeTab === 'cancelled'"
+        (click)="activeTab = 'cancelled'"
+      >
+        <span class="tab-dot dot-cancelled"></span>
         Cancelled
-        <span class="badge rounded-pill bg-danger">{{ cancelled.length }}</span>
+        <span class="tab-badge badge-cancelled">{{ cancelled.length }}</span>
       </button>
     </li>
   </ul>
@@ -43,15 +51,17 @@
     </div>
   } @else {
     <div class="d-flex flex-column gap-3">
-
       @for (a of activeList; track a.id) {
         <div class="card border">
           <div class="card-body d-flex align-items-start gap-3">
-
             <!-- Date block -->
-            <div class="appt-date-block bg-primary-subtle rounded-2 d-flex flex-column align-items-center justify-content-center flex-shrink-0">
-              <span class="fw-bold text-primary lh-1">{{ getDate(a.startingAt).split('-')[2] }}</span>
-              <span class="text-primary" style="font-size:0.625rem;text-transform:uppercase">
+            <div
+              class="appt-date-block bg-primary-subtle rounded-2 d-flex flex-column align-items-center justify-content-center flex-shrink-0"
+            >
+              <span class="fw-bold text-primary lh-1">{{
+                getDate(a.startingAt).split('-')[2]
+              }}</span>
+              <span class="text-primary" style="font-size: 0.625rem; text-transform: uppercase">
                 {{ formatDate(getDate(a.startingAt)).split(' ')[2] }}
               </span>
             </div>
@@ -67,12 +77,19 @@
               @if (a.doctorSpecialty) {
                 <span class="small text-primary fw-medium">{{ a.doctorSpecialty }}</span>
               }
-                <span class="badge rounded-pill" [ngClass]="statusClass(a.statusId)">{{ statusLabel(a.statusId) }}</span>
-              </div>
               <span class="small text-muted d-flex align-items-center gap-1">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
                 </svg>
                 {{ formatDate(getDate(a.startingAt)) }} at {{ getTime(a.startingAt) }}
               </span>
@@ -80,7 +97,6 @@
 
             <!-- Actions -->
             @if (canCancel(a)) {
-            @if (activeTab === 'upcoming' && a.statusId !== 3) {
               <div class="flex-shrink-0">
                 <button
                   class="btn btn-sm btn-outline-danger"
@@ -94,7 +110,6 @@
                 </button>
               </div>
             }
-
           </div>
         </div>
       }
@@ -107,8 +122,6 @@
           }
         </div>
       }
-
     </div>
   }
-
 </div>
