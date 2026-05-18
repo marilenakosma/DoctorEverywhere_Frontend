@@ -8,7 +8,7 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="nav flex-column gap-1 px-2 py-3 flex-grow-1 overflow-y-auto">
+  <nav class="nav flex-column gap-3 px-3 py-4 flex-grow-1 overflow-y-auto">
     @if (role === UserRole.Patient) {
       <a
         class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2"
@@ -29,15 +29,15 @@
         routerLink="/patient/appointments"
         routerLinkActive="active"
       >
-        <i class="bi bi-calendar-event"></i> My Appointments
+        <i class="bi bi-calendar-event"></i>Appointments
       </a>
-      <a
+      <!-- <a
         class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2"
         routerLink="/patient/messages"
         routerLinkActive="active"
       >
         <i class="bi bi-chat-dots"></i> Messages
-      </a>
+      </a> -->
     }
 
     @if (role === UserRole.Doctor) {
@@ -62,13 +62,13 @@
       >
         <i class="bi bi-calendar-event"></i> Appointments
       </a>
-      <a
+      <!-- <a
         class="nav-link d-flex align-items-center gap-2 rounded-2 px-3 py-2"
         routerLink="/doctor/messages"
         routerLinkActive="active"
       >
         <i class="bi bi-chat-dots"></i> Messages
-      </a>
+      </a> -->
     }
 
     @if (role === UserRole.Manager) {

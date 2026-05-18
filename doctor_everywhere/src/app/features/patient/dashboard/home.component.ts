@@ -22,7 +22,7 @@ export class PatientHomeComponent implements OnInit {
 
   readonly user$: Observable<UserInfo | null> = this.auth.currentUser$;
 
-  upcomingAppointments: Appointment[] = [];
+  upcomingConfirmedAppointments: Appointment[] = [];
   pendingAppointments: Appointment[] = [];
   unreadMessages: Message[] = [];
   loading = true;
@@ -31,10 +31,12 @@ export class PatientHomeComponent implements OnInit {
     const today = new Date().toISOString().split('T')[0];
 
     this.svc.getMyAppointments().subscribe(appts => {
-      this.upcomingAppointments = appts
+      this.upcomingConfirmedAppointments = appts
         .filter(a => a.startingAt.split('T')[0] >= today && a.statusId === AppointmentStatus.Confirmed)
         .slice(0, 3);
-      this.pendingAppointments = appts.filter(a => a.statusId === AppointmentStatus.Pending);
+      this.pendingAppointments = appts
+        .filter(a => a.statusId === AppointmentStatus.Pending)
+        .slice(0, 3);
       this.loading = false;
       this.cdr.detectChanges();
     });
