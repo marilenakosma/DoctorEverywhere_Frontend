@@ -40,11 +40,19 @@ with role-specific areas (patient, doctor, manager) behind authentication and a 
 - JWT decode for auth 
 
 ## Key directories 
-- src/app/core — app shell, guards, and HTTP interceptors
-- src/app/features — feature areas and route configs for auth/patient/doctor/manager 
-- src/app/shared — shared models and services used across features 
-- src/environments — environment configuration including API base URL 
-- public/ and src/assets/ — static assets; global styles are configured in angular.json 
+```
+src/app/
+├── core/          # Guards, interceptors, app layout shell
+├── shared/        # shared models and services used across features 
+├── features/      # feature areas and route configs for auth/patient/doctor/manager 
+│   └── [feature]/
+│       ├── routes.ts
+│       ├── services/    # All HTTP calls for this domain
+│       ├── models/      # Types specific to this domain
+│       └── [page]/
+│           └── components/ 
+└── environments/  # API URL config
+```
 
 ## Essential build/test commands 
 - npm run start — dev server 
