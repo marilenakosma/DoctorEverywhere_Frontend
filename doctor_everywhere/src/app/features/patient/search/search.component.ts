@@ -60,7 +60,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
   reviewsLoading = false;
   averageRating = 0;
 
-  // Date picker — default to today in Athens time
+  // Date picker — greek Time-zone
   selectedDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Athens' });
   minDate      = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Athens' });
 
@@ -80,7 +80,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.map) this.map.remove();
   }
 
-  // ── Map ───────────────────────────────────────────────────────────────────
+  // Map 
 
   private initMap(): void {
     const mapEl = document.getElementById('search-map');
@@ -132,7 +132,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // ── Location ──────────────────────────────────────────────────────────────
+  // Location 
 
   useGPS(): void {
     if (!navigator.geolocation) {
@@ -183,7 +183,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
       .catch(() => { this.gpsError = 'Could not search address.'; });
   }
 
-  // ── Doctors ───────────────────────────────────────────────────────────────
+  //  Doctors 
 
   loadDoctors(): void {
     this.loading  = true;
@@ -196,7 +196,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // ── Booking ───────────────────────────────────────────────────────────────
+  // Booking 
 
   openBooking(doctor: Doctor): void {
     this.selectedDoctor = doctor;
@@ -262,7 +262,7 @@ export class SearchComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  //  Helpers 
 
   stars(rating: number): string[] {
     return Array.from({ length: 5 }, (_, i) => i < Math.round(rating) ? '★' : '☆');

@@ -22,7 +22,7 @@ export class AuthService {
     this.restoreSession();
   }
 
-  // ── Login ──────────────────────────────────────────────────────────────────
+  //  Login 
 
   login(payload: LoginRequest): Observable<AuthResponse> {
     if (this.USE_MOCK) return this.mockLogin(payload);
@@ -36,7 +36,7 @@ export class AuthService {
     );
   }
 
-  // ── Register ───────────────────────────────────────────────────────────────
+  // Register 
 
   register(payload: any): Observable<void> {
     if (this.USE_MOCK) return this.mockRegister(payload);
@@ -66,7 +66,7 @@ export class AuthService {
     );
   }
 
-  // ── Logout ─────────────────────────────────────────────────────────────────
+  //  Logout 
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
@@ -75,7 +75,7 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+  //  Helpers 
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
@@ -101,13 +101,13 @@ export class AuthService {
     return this.getCurrentUser()?.role === role;
   }
 
-  // ── Session restore ────────────────────────────────────────────────────────
+  //  Session restore 
 
   private restoreSession(): void {
     const token = this.getToken();
     if (!token) return;
 
-    // Reject mock tokens when USE_MOCK is off
+    
     if (token.startsWith('mock.')) {
       if (!this.USE_MOCK) {
         localStorage.removeItem(this.TOKEN_KEY);
@@ -146,7 +146,7 @@ export class AuthService {
     }
   }
 
-  // ── Auth success ───────────────────────────────────────────────────────────
+  //  Auth success 
 
   private handleAuthSuccess(res: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, res.token);
@@ -200,7 +200,7 @@ export class AuthService {
     this.currentUserSubject.next(updated);
   }
 
-  // ── Role extraction ────────────────────────────────────────────────────────
+  //  Role extraction 
 
   private extractRole(decoded: any): UserRole {
     const role = decoded.role
@@ -208,7 +208,7 @@ export class AuthService {
     return role as UserRole;
   }
 
-  // ── Redirect by role ───────────────────────────────────────────────────────
+  // Redirect by role 
 
   private redirectByRole(role: UserRole): void {
     const routes: Record<UserRole, string> = {
@@ -219,7 +219,7 @@ export class AuthService {
     this.router.navigate([routes[role] ?? '/auth/login']);
   }
 
-  // ── Mock helpers ───────────────────────────────────────────────────────────
+  //Mock helper
 
   private mockLogin(payload: LoginRequest): Observable<AuthResponse> {
     const role = payload.username.startsWith('doctor')

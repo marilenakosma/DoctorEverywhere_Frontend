@@ -6,7 +6,7 @@ import { Appointment, AppointmentRequest, AppointmentStatus, AppointmentStatusLa
 import { Message } from '../../../shared/models/message.model';
 import { environment } from '../../../../environments/environment';
 
-// Matches backend Specialty enum exactly
+//  backend Specialty enum mapping
 const SpecialtyMap: Record<string, number> = {
   'General Practitioner': 0,
   'Cardiologist':         1,
@@ -39,7 +39,7 @@ export class PatientService {
 
   constructor(private http: HttpClient) {}
 
-  // ── Doctors — REAL API ✅ ─────────────────────────────────────────────────
+  //  Doctors  
 
   getNearbyDoctors(specialty: number | string = ''): Observable<Doctor[]> {
     const params: any = {};
@@ -53,7 +53,7 @@ export class PatientService {
     );
   }
 
-  // ── Reviews — REAL API ✅ ─────────────────────────────────────────────────
+  //  Reviews 
 
   getDoctorReviews(doctorId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.base}/review/${doctorId}`).pipe(
@@ -61,7 +61,7 @@ export class PatientService {
     );
   }
 
-  // ── Slots — REAL API ✅ ───────────────────────────────────────────────────
+  //  Slots
 
   getDoctorSlots(doctorId: string, date?: Date): Observable<TimeSlot[]> {
     const selectedDate = date ?? new Date();
@@ -81,7 +81,7 @@ export class PatientService {
     );
   }
 
-  // ── Appointments — REAL API ✅ ────────────────────────────────────────────
+  // Appointments  
 
   getMyAppointments(): Observable<Appointment[]> {
     return this.http.get<any[]>(`${this.base}/appointment/my`).pipe(
@@ -91,8 +91,8 @@ export class PatientService {
   }
 
   deletePatientProfile(): Observable<string> {
-    // Because the C# backend returns a plain string in the 200 OK response, 
-    // we MUST tell Angular to expect text, not JSON.
+    // Because  C# backend returns  plain string in the  OK response, 
+    //  Angular to expect text
     return this.http.delete(`${this.base}/patient/delete`, { responseType: 'text' });
   }
 
@@ -125,7 +125,7 @@ export class PatientService {
     );
   }
 
-  // ── Messages — MOCK ⏳ ────────────────────────────────────────────────────
+  // Messages 
 
   getMyMessages(): Observable<Message[]> {
     return of(MOCK_MESSAGES);
@@ -145,7 +145,7 @@ export class PatientService {
     return of(msg);
   }
 
-  // ── Mappers ───────────────────────────────────────────────────────────────
+  // Mappers 
 
   private mapDoctor(d: any): Doctor {
     return {

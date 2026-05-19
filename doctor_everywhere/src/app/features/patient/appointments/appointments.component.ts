@@ -35,7 +35,7 @@ export class AppointmentsComponent implements OnInit {
 get today(): string {
   return new Date().toLocaleDateString('en-CA', {
     timeZone: 'Europe/Athens'
-  }); // returns YYYY-MM-DD in Athens time
+  }); // returns YYYY-MM-DD in Greek Time Zone
 }
 
   get upcoming(): Appointment[] {
