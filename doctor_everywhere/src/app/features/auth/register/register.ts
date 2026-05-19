@@ -17,6 +17,22 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
   return pw && confirm && pw !== confirm ? { passwordMismatch: true } : null;
 }
 
+function passwordLowercaseValidator(control: AbstractControl): ValidationErrors | null {
+  return control.value && !/[a-z]/.test(control.value) ? { lowercase: true } : null;
+}
+
+function passwordUppercaseValidator(control: AbstractControl): ValidationErrors | null {
+  return control.value && !/[A-Z]/.test(control.value) ? { uppercase: true } : null;
+}
+
+function passwordNumberValidator(control: AbstractControl): ValidationErrors | null {
+  return control.value && !/[0-9]/.test(control.value) ? { number: true } : null;
+}
+
+function passwordSpecialValidator(control: AbstractControl): ValidationErrors | null {
+  return control.value && !/[^A-Za-z0-9]/.test(control.value) ? { special: true } : null;
+}
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -63,7 +79,7 @@ export class RegisterComponent implements OnInit {
       officeAddress:    [''],
       officeCity:       [''],
       officePostalCode: [''],
-      password:         ['', [Validators.required, Validators.minLength(8)]],  // ← 8 chars
+      password:         ['', [Validators.required, Validators.minLength(8), passwordLowercaseValidator, passwordUppercaseValidator, passwordNumberValidator, passwordSpecialValidator]],
       confirmPassword:  ['', Validators.required],
     }, { validators: passwordMatchValidator });
 
@@ -96,23 +112,24 @@ export class RegisterComponent implements OnInit {
   }
 
   get passwordValue(): string { return this.password.value ?? ''; }
-  get hasMinLength(): boolean { return this.passwordValue.length >= 8; }  // ← 8 chars
-  get hasUppercase(): boolean { return /[A-Z]/.test(this.passwordValue); }
-  get hasNumber(): boolean    { return /[0-9]/.test(this.passwordValue); }
-  get hasSpecial(): boolean   { return /[^A-Za-z0-9]/.test(this.passwordValue); }
+  get hasMinLength(): boolean  { return this.passwordValue.length >= 8; }
+  get hasUppercase(): boolean  { return /[A-Z]/.test(this.passwordValue); }
+  get hasLowercase(): boolean  { return /[a-z]/.test(this.passwordValue); }
+  get hasNumber(): boolean     { return /[0-9]/.test(this.passwordValue); }
+  get hasSpecial(): boolean    { return /[^A-Za-z0-9]/.test(this.passwordValue); }
 
   get strengthScore(): number {
-    return [this.hasMinLength, this.hasUppercase, this.hasNumber, this.hasSpecial]
+    return [this.hasMinLength, this.hasUppercase, this.hasLowercase, this.hasNumber, this.hasSpecial]
       .filter(Boolean).length;
   }
 
   get strengthLabel(): string {
-    const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+    const labels = ['', 'Weak', 'Weak', 'Fair', 'Good', 'Strong'];
     return labels[this.strengthScore] ?? '';
   }
 
   get strengthClass(): string {
-    const classes = ['', 'weak', 'fair', 'good', 'strong'];
+    const classes = ['', 'weak', 'weak', 'fair', 'good', 'strong'];
     return classes[this.strengthScore] ?? '';
   }
 
@@ -120,7 +137,7 @@ export class RegisterComponent implements OnInit {
     if (!this.passwordValue || this.strengthScore === 0) return '';
     if (index >= this.strengthScore) return '';
     const classes = ['active-weak', 'active-fair', 'active-good', 'active-strong'];
-    return classes[this.strengthScore - 1];
+    return classes[Math.min(this.strengthScore - 1, 3)];
   }
 
   private async geocodeAddress(): Promise<{ lat: number; lng: number } | null> {

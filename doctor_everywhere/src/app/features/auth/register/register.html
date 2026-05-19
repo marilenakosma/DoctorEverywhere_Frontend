@@ -1,33 +1,37 @@
 <div class="auth-wrapper">
   <div class="auth-card">
-
     <div class="auth-header">
-      <div class="logo-mark">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
-          <rect width="32" height="32" rx="8" fill="#185FA5"/>
-          <text x="16" y="22" font-family="Arial" font-weight="bold" font-size="16" fill="white" text-anchor="middle">DE</text>
-        </svg>
+      <div>
+        <img src="logo-trans.png" alt="DoctorEverywhere" height="180" style="object-fit: contain" />
       </div>
       <h1 class="auth-title">Create your account</h1>
       <p class="auth-subtitle">Join DoctorEverywhere in seconds</p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="auth-form">
-
       <!-- Error banner -->
       <div class="error-banner" *ngIf="errorMessage" role="alert">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M8 5v3.5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" />
+          <path
+            d="M8 5v3.5M8 11h.01"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
         </svg>
         {{ errorMessage }}
       </div>
 
       <!-- Role selector -->
       <div class="role-selector">
-        <button *ngFor="let r of roles" type="button" class="role-btn"
-                [class.active]="role.value === r.value"
-                (click)="role.setValue(r.value)">
+        <button
+          *ngFor="let r of roles"
+          type="button"
+          class="role-btn"
+          [class.active]="role.value === r.value"
+          (click)="role.setValue(r.value)"
+        >
           <span class="role-btn-label">{{ r.label }}</span>
           <span class="role-btn-desc">{{ r.description }}</span>
         </button>
@@ -36,23 +40,49 @@
       <!-- Username -->
       <div class="form-group" [class.has-error]="username.invalid && username.touched">
         <label class="form-label" for="username">Username</label>
-        <input id="username" type="text" class="form-input" formControlName="username"
-               placeholder="your_username" autocomplete="username"/>
-        <span class="form-error" *ngIf="username.touched && username.errors?.['required']">Username is required.</span>
-        <span class="form-error" *ngIf="username.touched && username.errors?.['minlength']">At least 3 characters.</span>
+        <input
+          id="username"
+          type="text"
+          class="form-input"
+          formControlName="username"
+          placeholder="your_username"
+          autocomplete="username"
+        />
+        <span class="form-error" *ngIf="username.touched && username.errors?.['required']"
+          >Username is required.</span
+        >
+        <span class="form-error" *ngIf="username.touched && username.errors?.['minlength']"
+          >At least 3 characters.</span
+        >
       </div>
 
       <!-- Name row -->
       <div class="form-row">
         <div class="form-group" [class.has-error]="firstName.invalid && firstName.touched">
           <label class="form-label" for="firstName">First name</label>
-          <input id="firstName" type="text" class="form-input" formControlName="firstName" placeholder="Jane"/>
-          <span class="form-error" *ngIf="firstName.touched && firstName.errors?.['required']">Required.</span>
+          <input
+            id="firstName"
+            type="text"
+            class="form-input"
+            formControlName="firstName"
+            placeholder="Jane"
+          />
+          <span class="form-error" *ngIf="firstName.touched && firstName.errors?.['required']"
+            >Required.</span
+          >
         </div>
         <div class="form-group" [class.has-error]="lastName.invalid && lastName.touched">
           <label class="form-label" for="lastName">Last name</label>
-          <input id="lastName" type="text" class="form-input" formControlName="lastName" placeholder="Smith"/>
-          <span class="form-error" *ngIf="lastName.touched && lastName.errors?.['required']">Required.</span>
+          <input
+            id="lastName"
+            type="text"
+            class="form-input"
+            formControlName="lastName"
+            placeholder="Smith"
+          />
+          <span class="form-error" *ngIf="lastName.touched && lastName.errors?.['required']"
+            >Required.</span
+          >
         </div>
       </div>
 
@@ -70,32 +100,80 @@
 
           <div class="form-group" [class.has-error]="officeName.invalid && officeName.touched">
             <label class="form-label">Office name</label>
-            <input type="text" class="form-input" formControlName="officeName" placeholder="City Medical Center"/>
-            <span class="form-error" *ngIf="officeName.touched && officeName.errors?.['required']">Required.</span>
+            <input
+              type="text"
+              class="form-input"
+              formControlName="officeName"
+              placeholder="City Medical Center"
+            />
+            <span class="form-error" *ngIf="officeName.touched && officeName.errors?.['required']"
+              >Required.</span
+            >
           </div>
 
           <div class="form-row">
-            <div class="form-group" [class.has-error]="officeAddress.invalid && officeAddress.touched">
+            <div
+              class="form-group"
+              [class.has-error]="officeAddress.invalid && officeAddress.touched"
+            >
               <label class="form-label">Street address</label>
-              <input type="text" class="form-input" formControlName="officeAddress" placeholder="Kifisias 12"/>
-              <span class="form-error" *ngIf="officeAddress.touched && officeAddress.errors?.['required']">Required.</span>
+              <input
+                type="text"
+                class="form-input"
+                formControlName="officeAddress"
+                placeholder="Kifisias 12"
+              />
+              <span
+                class="form-error"
+                *ngIf="officeAddress.touched && officeAddress.errors?.['required']"
+                >Required.</span
+              >
             </div>
             <div class="form-group" [class.has-error]="officeCity.invalid && officeCity.touched">
               <label class="form-label">City</label>
-              <input type="text" class="form-input" formControlName="officeCity" placeholder="Athens"/>
-              <span class="form-error" *ngIf="officeCity.touched && officeCity.errors?.['required']">Required.</span>
+              <input
+                type="text"
+                class="form-input"
+                formControlName="officeCity"
+                placeholder="Athens"
+              />
+              <span class="form-error" *ngIf="officeCity.touched && officeCity.errors?.['required']"
+                >Required.</span
+              >
             </div>
           </div>
 
-          <div class="form-group" [class.has-error]="officePostalCode.invalid && officePostalCode.touched">
+          <div
+            class="form-group"
+            [class.has-error]="officePostalCode.invalid && officePostalCode.touched"
+          >
             <label class="form-label">Postal code</label>
-            <input type="text" class="form-input" formControlName="officePostalCode" placeholder="11526"/>
-            <span class="form-error" *ngIf="officePostalCode.touched && officePostalCode.errors?.['required']">Required.</span>
+            <input
+              type="text"
+              class="form-input"
+              formControlName="officePostalCode"
+              placeholder="11526"
+            />
+            <span
+              class="form-error"
+              *ngIf="officePostalCode.touched && officePostalCode.errors?.['required']"
+              >Required.</span
+            >
           </div>
 
           <div class="geocoding-note">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4M12 8h.01" />
             </svg>
             Coordinates are calculated automatically from your address.
           </div>
@@ -106,17 +184,50 @@
       <div class="form-group" [class.has-error]="password.invalid && password.touched">
         <label class="form-label" for="password">Password</label>
         <div class="input-wrapper">
-          <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-input has-suffix"
-                 formControlName="password" placeholder="••••••••" autocomplete="new-password"/>
-          <button type="button" class="input-suffix-btn" (click)="togglePassword('password')"
-                  [title]="showPassword ? 'Hide password' : 'Show password'">
-            <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 12s3.636-7 10-7 10 7 10 7-3.636 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-input has-suffix"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+          <button
+            type="button"
+            class="input-suffix-btn"
+            (click)="togglePassword('password')"
+            [title]="showPassword ? 'Hide password' : 'Show password'"
+          >
+            <svg
+              *ngIf="!showPassword"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M2 12s3.636-7 10-7 10 7 10 7-3.636 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
             </svg>
-            <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-              <line x1="1" y1="1" x2="23" y2="23"/>
+            <svg
+              *ngIf="showPassword"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
+              />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <line x1="1" y1="1" x2="23" y2="23" />
             </svg>
           </button>
         </div>
@@ -144,6 +255,10 @@
             <span class="rule-icon">{{ hasUppercase ? '✓' : '○' }}</span>
             One uppercase letter (A-Z)
           </div>
+          <div class="rule" [class.met]="hasLowercase" [class.unmet]="!hasLowercase">
+            <span class="rule-icon">{{ hasLowercase ? '✓' : '○' }}</span>
+            One lowercase letter (a-z)
+          </div>
           <div class="rule" [class.met]="hasNumber" [class.unmet]="!hasNumber">
             <span class="rule-icon">{{ hasNumber ? '✓' : '○' }}</span>
             One number (0-9)
@@ -160,33 +275,87 @@
         <span class="form-error" *ngIf="password.touched && password.errors?.['minlength']">
           Password must be at least 8 characters.
         </span>
+        <span class="form-error" *ngIf="password.touched && password.errors?.['lowercase']">
+          Password must contain at least one lowercase letter.
+        </span>
+        <span class="form-error" *ngIf="password.touched && password.errors?.['uppercase']">
+          Password must contain at least one uppercase letter.
+        </span>
+        <span class="form-error" *ngIf="password.touched && password.errors?.['number']">
+          Password must contain at least one number.
+        </span>
+        <span class="form-error" *ngIf="password.touched && password.errors?.['special']">
+          Password must contain at least one special character.
+        </span>
       </div>
 
       <!-- Confirm password -->
-      <div class="form-group" [class.has-error]="passwordMismatch || (confirmPassword.touched && confirmPassword.errors?.['required'])">
+      <div
+        class="form-group"
+        [class.has-error]="
+          passwordMismatch || (confirmPassword.touched && confirmPassword.errors?.['required'])
+        "
+      >
         <label class="form-label" for="confirmPassword">Confirm password</label>
         <div class="input-wrapper">
-          <input id="confirmPassword" [type]="showConfirm ? 'text' : 'password'" class="form-input has-suffix"
-                 formControlName="confirmPassword" placeholder="••••••••" autocomplete="new-password"/>
-          <button type="button" class="input-suffix-btn" (click)="togglePassword('confirm')"
-                  [title]="showConfirm ? 'Hide password' : 'Show password'">
-            <svg *ngIf="!showConfirm" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 12s3.636-7 10-7 10 7 10 7-3.636 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
+          <input
+            id="confirmPassword"
+            [type]="showConfirm ? 'text' : 'password'"
+            class="form-input has-suffix"
+            formControlName="confirmPassword"
+            placeholder="••••••••"
+            autocomplete="new-password"
+          />
+          <button
+            type="button"
+            class="input-suffix-btn"
+            (click)="togglePassword('confirm')"
+            [title]="showConfirm ? 'Hide password' : 'Show password'"
+          >
+            <svg
+              *ngIf="!showConfirm"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M2 12s3.636-7 10-7 10 7 10 7-3.636 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
             </svg>
-            <svg *ngIf="showConfirm" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-              <line x1="1" y1="1" x2="23" y2="23"/>
+            <svg
+              *ngIf="showConfirm"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
+              />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <line x1="1" y1="1" x2="23" y2="23" />
             </svg>
           </button>
         </div>
-        <span class="form-error" *ngIf="confirmPassword.touched && confirmPassword.errors?.['required']">
+        <span
+          class="form-error"
+          *ngIf="confirmPassword.touched && confirmPassword.errors?.['required']"
+        >
           Please confirm your password.
         </span>
-        <span class="form-error" *ngIf="passwordMismatch">
-          Passwords do not match.
-        </span>
-        <span class="form-success" *ngIf="!passwordMismatch && confirmPassword.value && confirmPassword.touched">
+        <span class="form-error" *ngIf="passwordMismatch"> Passwords do not match. </span>
+        <span
+          class="form-success"
+          *ngIf="!passwordMismatch && confirmPassword.value && confirmPassword.touched"
+        >
           ✓ Passwords match
         </span>
       </div>
@@ -201,12 +370,8 @@
           <span class="spinner"></span>Creating account…
         </span>
       </button>
-
     </form>
 
-    <p class="auth-footer">
-      Already have an account? <a routerLink="/auth/login">Sign in</a>
-    </p>
-
+    <p class="auth-footer">Already have an account? <a routerLink="/auth/login">Sign in</a></p>
   </div>
 </div>
