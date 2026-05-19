@@ -27,8 +27,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Markdown files
-*.md
 
 #Txt files
 *.txt
+doctor_everywhere/ReadMe2.md
+doctor_everywhere/frontendAgent.md
+agents.md
