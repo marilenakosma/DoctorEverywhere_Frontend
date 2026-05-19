@@ -32,7 +32,11 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
-  get today(): string { return new Date().toISOString().split('T')[0]; }
+get today(): string {
+  return new Date().toLocaleDateString('en-CA', {
+    timeZone: 'Europe/Athens'
+  }); // returns YYYY-MM-DD in Athens time
+}
 
   get upcoming(): Appointment[] {
     return this.appointments.filter(a =>
@@ -91,12 +95,24 @@ export class AppointmentsComponent implements OnInit {
            a.status !== 'rejected';
   }
 
-  getDate(startingAt: string): string { return startingAt.split('T')[0]; }
-  getTime(startingAt: string): string { return startingAt.split('T')[1].slice(0, 5); }
+  getDate(startingAt: string): string {
+  return new Date(startingAt).toLocaleDateString('en-CA', {
+    timeZone: 'Europe/Athens',
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  }); // returns YYYY-MM-DD
+}
 
-  formatDate(d: string): string {
-    return new Date(d).toLocaleDateString('en-GB', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    });
-  }
+getTime(startingAt: string): string {
+  return new Date(startingAt).toLocaleTimeString('en-GB', {
+    timeZone: 'Europe/Athens',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+formatDate(d: string): string {
+  return new Date(d).toLocaleDateString('en-GB', {
+    timeZone: 'Europe/Athens',
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+}
 }

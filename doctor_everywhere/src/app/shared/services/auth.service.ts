@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap, catchError, throwError, of } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, throwError, of, switchMap, map } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../../environments/environment';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
@@ -50,12 +50,18 @@ export class AuthService {
     const { role, ...body } = payload;
 
     return this.http.post<void>(url, body).pipe(
-      tap(() => {
-        this.login({
-          username: payload.username,
-          password: payload.password,
-        }).subscribe();
-      }),
+      switchMap(() =>
+        this.login({ username: payload.username, password: payload.password }).pipe(
+          tap(() => {
+            // Patch name immediately since JWT doesn't carry firstName/lastName
+            const current = this.getCurrentUser();
+            if (current && !current.firstName) {
+              this.updateUserName(current, payload.firstName, payload.lastName);
+            }
+          })
+        )
+      ),
+      map(() => void 0),
       catchError(err => throwError(() => this.extractErrorMessage(err)))
     );
   }
@@ -174,19 +180,9 @@ export class AuthService {
 
   private fetchAndUpdateName(user: UserInfo): void {
     if (user.role === UserRole.Patient) {
-      this.http.get<any>(`${environment.apiUrl}/api/patient/me`).subscribe({
+      this.http.get<any>(`${environment.apiUrl}/api/patient/my`).subscribe({
         next: p => this.updateUserName(user, p.firstName, p.lastName),
-        error: () => {
-          // fallback — get all patients and take first
-          this.http.get<any[]>(`${environment.apiUrl}/api/patient`).subscribe({
-            next: patients => {
-              if (patients?.length > 0) {
-                this.updateUserName(user, patients[0].firstName, patients[0].lastName);
-              }
-            },
-            error: () => {}
-          });
-        }
+        error: () => {}
       });
     }
 

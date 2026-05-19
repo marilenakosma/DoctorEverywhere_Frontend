@@ -5,13 +5,12 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
 import { UserRole } from '../../../shared/models/user-identity.model';
 
-//Custom no space in user name validator//
 function noSpacesValidator(control: AbstractControl): ValidationErrors | null {
-  return control.value && control.value.includes(' ') 
-    ? { noSpaces: true } 
+  return control.value && control.value.includes(' ')
+    ? { noSpaces: true }
     : null;
 }
-//Custom password validator//
+
 function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
   const pw      = group.get('password')?.value;
   const confirm = group.get('confirmPassword')?.value;
@@ -55,11 +54,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-       username: ['', [
-       Validators.required, 
-        Validators.minLength(3),
-       noSpacesValidator  // ← add this
-       ]],
+      username:         ['', [Validators.required, Validators.minLength(3), noSpacesValidator]],
       firstName:        ['', [Validators.required, Validators.minLength(2)]],
       lastName:         ['', [Validators.required, Validators.minLength(2)]],
       role:             [UserRole.Patient, Validators.required],
@@ -68,7 +63,7 @@ export class RegisterComponent implements OnInit {
       officeAddress:    [''],
       officeCity:       [''],
       officePostalCode: [''],
-      password:         ['', [Validators.required, Validators.minLength(6)]],
+      password:         ['', [Validators.required, Validators.minLength(8)]],  // ← 8 chars
       confirmPassword:  ['', Validators.required],
     }, { validators: passwordMatchValidator });
 
@@ -83,8 +78,6 @@ export class RegisterComponent implements OnInit {
       });
     });
   }
-
-  // ── Getters ────
 
   get username()         { return this.form.get('username')!; }
   get firstName()        { return this.form.get('firstName')!; }
@@ -102,11 +95,8 @@ export class RegisterComponent implements OnInit {
     return this.form.hasError('passwordMismatch') && this.confirmPassword.touched;
   }
 
-  // ── Password strength ──────
-
   get passwordValue(): string { return this.password.value ?? ''; }
-
-  get hasMinLength(): boolean { return this.passwordValue.length >= 6; }
+  get hasMinLength(): boolean { return this.passwordValue.length >= 8; }  // ← 8 chars
   get hasUppercase(): boolean { return /[A-Z]/.test(this.passwordValue); }
   get hasNumber(): boolean    { return /[0-9]/.test(this.passwordValue); }
   get hasSpecial(): boolean   { return /[^A-Za-z0-9]/.test(this.passwordValue); }
@@ -133,16 +123,25 @@ export class RegisterComponent implements OnInit {
     return classes[this.strengthScore - 1];
   }
 
-  // ── Geocode address → lat/lng ───────
-
   private async geocodeAddress(): Promise<{ lat: number; lng: number } | null> {
     const address = this.form.get('officeAddress')!.value;
     const city    = this.form.get('officeCity')!.value;
     const postal  = this.form.get('officePostalCode')!.value;
-    const query   = `${address}, ${postal} ${city}, Greece`;
-    const url     = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=gr`;
 
+    const q1 = `${address}, ${postal} ${city}, Greece`;
+    const r1  = await this.nominatim(q1);
+    if (r1) return r1;
+
+    const q2 = `${address}, ${city}, Greece`;
+    const r2  = await this.nominatim(q2);
+    if (r2) return r2;
+
+    return await this.nominatim(`${city}, Greece`);
+  }
+
+  private async nominatim(query: string): Promise<{ lat: number; lng: number } | null> {
     try {
+      const url     = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=gr`;
       const res     = await fetch(url);
       const results = await res.json();
       if (results?.length > 0) {
@@ -151,8 +150,6 @@ export class RegisterComponent implements OnInit {
       return null;
     } catch { return null; }
   }
-
-  // ── Submit ─────
 
   async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
@@ -183,6 +180,7 @@ export class RegisterComponent implements OnInit {
       };
 
       this.authService.register(payload).subscribe({
+        next: () => { this.loading = false; },
         error: (msg: string) => { this.errorMessage = msg; this.loading = false; }
       });
 
@@ -194,6 +192,7 @@ export class RegisterComponent implements OnInit {
       };
 
       this.authService.register(payload).subscribe({
+        next: () => { this.loading = false; },
         error: (msg: string) => { this.errorMessage = msg; this.loading = false; }
       });
     }

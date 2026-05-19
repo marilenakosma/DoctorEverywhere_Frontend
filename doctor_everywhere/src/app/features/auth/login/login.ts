@@ -4,7 +4,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractContro
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
 
-// Add at top of file after imports
 function noSpacesValidator(control: AbstractControl): ValidationErrors | null {
   return control.value && control.value.includes(' ')
     ? { noSpaces: true }
@@ -28,25 +27,19 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-            username: ['',[
-             Validators.required, 
-             Validators.minLength(3),
-               noSpacesValidator]],      
-           password: ['', [Validators.required, Validators.minLength(6)]],
-              });
-             }
+      username: ['', [Validators.required, Validators.minLength(3), noSpacesValidator]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+    });
+  }
 
   get username() { return this.form.get('username')!; }
-  get password()  { return this.form.get('password')!; }
-
-  // ── Password strength ───
+  get password() { return this.form.get('password')!; }
 
   get passwordValue(): string { return this.password.value ?? ''; }
-
-  get hasMinLength(): boolean  { return this.passwordValue.length >= 6; }
-  get hasUppercase(): boolean  { return /[A-Z]/.test(this.passwordValue); }
-  get hasNumber(): boolean     { return /[0-9]/.test(this.passwordValue); }
-  get hasSpecial(): boolean    { return /[^A-Za-z0-9]/.test(this.passwordValue); }
+  get hasMinLength(): boolean { return this.passwordValue.length >= 8; }
+  get hasUppercase(): boolean { return /[A-Z]/.test(this.passwordValue); }
+  get hasNumber(): boolean    { return /[0-9]/.test(this.passwordValue); }
+  get hasSpecial(): boolean   { return /[^A-Za-z0-9]/.test(this.passwordValue); }
 
   get strengthScore(): number {
     return [this.hasMinLength, this.hasUppercase, this.hasNumber, this.hasSpecial]
@@ -70,17 +63,16 @@ export class LoginComponent implements OnInit {
     return classes[this.strengthScore - 1];
   }
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
-
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading      = true;
     this.errorMessage = '';
 
     this.authService.login(this.form.value).subscribe({
-      error: (msg: string) => {
-        this.errorMessage = msg;
+      next: () => { this.loading = false; },
+      error: () => {
         this.loading      = false;
+        this.errorMessage = 'Incorrect username or password. Please try again.';
       }
     });
   }
